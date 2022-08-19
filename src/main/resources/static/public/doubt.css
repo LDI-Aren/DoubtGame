@@ -1,0 +1,76 @@
+body{
+  margin : 0px;
+}
+
+.Header{
+  display: block;
+  height: calc(5vh) !important;
+}
+
+.Hands {
+  display : flex;
+  flex-direction : row;
+  overflow-x: scroll;
+  scroll-behavior: smooth;
+  height : 21%;
+}
+
+.Hand {
+  margin: 3px;
+}
+
+.Hand>img{
+  object-position: 2px;
+}
+
+.ClickedHand{
+  margin: 0px;
+}
+
+.ClickedHand>img{
+  border : 3px solid yellow;
+}
+
+.Hand:hover{
+  opacity: 0.7;
+}
+
+.Field{
+  height: calc(95vh);
+  background-color: #373737;
+}
+
+.Players{
+  display: flex;
+  justify-content: space-around;
+  height: 10%;
+}
+
+.GameField{
+  height:60%;
+}
+
+.SendBtn{
+  border: 0px;
+  height: 100%;
+  width: 30%;
+  background-color: aquamarine;
+}
+
+.SendBtn:hover{
+  opacity: 0.7;
+}
+
+.BtnField{
+  display: flex;
+  justify-content: center;
+  height: 7.5%;
+}
+
+.Gauge{
+  height:0.5%;
+}
+
+.dNone{
+  display: none;
+}

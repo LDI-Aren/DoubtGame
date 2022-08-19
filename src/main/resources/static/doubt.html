@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="kr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doubt</title>
+    <link rel="stylesheet" href="/public/doubt.css">
+</head>
+<script src="/public/doubt.js"></script>
+
+<body>
+    <div class="Field">
+
+        <div class="Players">
+            <div class="Player">Player1</div>
+            <div class="Player">Player2</div>
+            <div class="Player">Player3</div>
+        </div>
+
+        <div class="GameField">
+
+        </div>
+
+        <div class="Gauge">
+
+        </div>
+
+        <div class="BtnField">
+            <button id="SendBtn" class="SendBtn" onclick="sendCard()">카드 내기</button>
+            <button onclick="gameStart()">게임 시작</button>
+        </div>
+
+        <div id="Hands" class="Hands">
+
+        </div>
+
+    </div>
+
+    <div id="imageStore" class="dNone"></div>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+<script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+    let socket;
+    let stompClient;
+
+    let getMessage = {
+        "START" : (data) => {
+            if(data )
+
+            getHands(JSON.parse(data));
+    },
+        "PLAY" : (data) => {
+            console.log(data);
+        },
+        "ERROR" : (data) => {
+            console.log(data);
+        }
+    }
+
+
+    window.onload = () => {
+        CardInit();
+
+        socket = SockJS('/connect');
+        stompClient = Stomp.over(socket);
+
+        stompClient.connect({}, ()=>{
+            stompClient.subscribe(`/topic/game-room/${params.roomId}`, (msg) => {
+                let data = JSON.parse(msg.body);
+                console.log(data);
+                getMessage[data.type](data.value);
+            });
+
+            stompClient.send(`/message/play/${params.roomId}`, {} ,JSON.stringify({"type" : "PLAY" , "value" : "testMessage"}))
+        },(error)=>{console.log(error)});
+    }
+
+
+    function gameStart(){
+        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "name" : "player1"}));
+    }
+
+</script>
+
+</html>

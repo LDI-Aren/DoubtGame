@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>List</title>
+</head>
+<body>
+    <input type="text" id="roomName">
+    <button onclick="createGameroom()">게임방 만들기</button>
+
+    <ui id = "roomList">
+
+    </ui>
+</body>
+<script>
+    window.onload = ()=>{
+        getRoomList();
+    }
+
+    function getRoomList(){
+        fetch("games/doubt/rooms/list")
+            .then(d=>d.json())
+            .then(
+                e=>{
+                    roomList.innerHTML = "";
+                    e.forEach(a=>{
+                        let li = document.createElement("li");
+                        li.innerText = `${a.gameName} --- ${a.roomName} : ${a.roomId}`;
+
+                        li.onclick = ()=> location.href = `/games/${a.gameName}/rooms?roomId=${a.roomId}`;
+                        roomList.appendChild(li);
+                    })
+                }
+            );
+    }
+
+    function createGameroom(){
+        let name = roomName.value;
+        if(name == null){
+           return
+        }
+
+        fetch("games/doubt/rooms",{
+            method : "post",
+            headers : {
+                "content-type" : "application/json; charset=utf-8"
+            },
+            body : JSON.stringify(name)
+        }).then(() => getRoomList());
+    }
+</script>
+</html>
