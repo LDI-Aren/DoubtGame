@@ -1,6 +1,7 @@
 package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
+import com.bg.doubt.card.CardList;
 import com.bg.doubt.card.CardSetter;
 import com.bg.doubt.controller.RoomElement;
 import com.bg.doubt.gameMessage.GameMessage;
@@ -55,13 +56,13 @@ public class DoubtService {
             return;
         }
 
-        if(!isExistRoom(msg, roomId)){
+        if(!gameRooms.containsKey(roomId)){
+            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
             return;
         }
 
         if(gameRooms.get(roomId).numberOfPlayer() != 4){
-            msg.setType(MessageType.ERROR);
-            msg.setValue("게임을 시작하기 위한 인원이 부족합니다.");
+            setErrorMessage(msg, "게임을 시작하기 위한 인원이 부족합니다.");
             return;
         }
 
@@ -69,13 +70,13 @@ public class DoubtService {
     }
 
     public void joinPlayer(GameMessage msg, String roomId) {
-        if(!isExistRoom(msg, roomId)){
+        if(!gameRooms.containsKey(roomId)){
+            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
             return;
         }
 
         if(gameRooms.get(roomId).numberOfPlayer() >= 4){
-            msg.setType(MessageType.ERROR);
-            msg.setValue("방안에 인원이 꽉 찼습니다.");
+            setErrorMessage(msg, "방안에 인원이 꽉 찼습니다.");
             return;
         }
 
@@ -84,39 +85,36 @@ public class DoubtService {
     }
 
     public void sendCard(GameMessage msg, String roomId) {
-        List<String> cards = List.of(gson.fromJson(msg.getValue(),String[].class));
+        CardList cards = gson.fromJson(msg.getValue(),CardList.class);
 
-        if(!isExistRoom(msg, roomId)){
+        if(!gameRooms.containsKey(roomId)){
+            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
             return;
         }
 
         Player nextPlayer = gameRooms.get(roomId).sendCard(cards);
 
         if(nextPlayer == null){
-            msg.setType(MessageType.ERROR);
-            msg.setValue("존재하지 않는 플레이어 입니다.");
+            setErrorMessage(msg, "존재하지 않는 플레이어 입니다.");
             return;
         }
 
-        List<String> value = List.of(nextPlayer.getName(), String.valueOf(cards.size()));
+        List<String> value = List.of(nextPlayer.getName(), String.valueOf(cards.getCards().size()));
         msg.setValue(gson.toJson(value));
     }
 
-    private boolean isExistRoom(GameMessage msg, String roomId){
-        if(!gameRooms.containsKey(roomId)){
+    private void setErrorMessage(GameMessage msg, String value){
             msg.setType(MessageType.ERROR);
-            msg.setValue("게임방이 존재하지 않습니다.");
-            return false;
-        }
-
-        return true;
+            msg.setValue(value);
     }
 
     public void callDoubt(GameMessage msg, String roomId) {
-        if(!isExistRoom(msg, roomId)){
+        if(!gameRooms.containsKey(roomId)){
+            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
             return;
         }
 
-        gameRooms.get(roomId).callDoubt(msg.getUserId());
+        DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getUserId());
+        msg.setValue(gson.toJson(dr));
     }
 }

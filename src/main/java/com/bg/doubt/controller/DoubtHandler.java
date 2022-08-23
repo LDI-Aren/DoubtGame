@@ -1,5 +1,6 @@
 package com.bg.doubt.controller;
 
+import com.bg.doubt.doubt.DoubtResult;
 import com.bg.doubt.doubt.DoubtService;
 import com.bg.doubt.gameMessage.GameMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
 
@@ -14,10 +16,12 @@ import org.springframework.stereotype.Controller;
 @Slf4j
 public class DoubtHandler {
     DoubtService doubtService;
+    SimpMessagingTemplate messagingTemplate;
 
     @Autowired
-    public DoubtHandler(DoubtService doubtService) {
+    public DoubtHandler(DoubtService doubtService, SimpMessagingTemplate messagingTemplate) {
         this.doubtService = doubtService;
+        this.messagingTemplate = messagingTemplate;
     }
 
     @MessageMapping("/join/{roomId}")
@@ -38,7 +42,6 @@ public class DoubtHandler {
     @MessageMapping("/start/{roomId}")
     @SendTo("/topic/game-room/{roomId}")
     public GameMessage startGame(GameMessage msg, @DestinationVariable("roomId") String roomId){
-
         doubtService.canStartGame(msg, roomId);
         return msg;
     }
