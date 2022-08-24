@@ -40,20 +40,21 @@ public class Doubt {
     }
 
     public Player sendCard(CardList inputCards){
-        Player player =  players.get(turn);
+        Player player =  players.get(turn%players.size());
         if(player == null){
             return null;
         }
 
         int result = player.sendCards(inputCards);
+        field.add(inputCards);
 
         if(result == 0){
             //해당 turn player의 승리
         }
 
-        turn = (turn+1)%players.size();
+        turn++;
 
-        return players.get(turn);
+        return players.get(turn%players.size());
     }
 
     public DoubtResult callDoubt(String playerId){
@@ -61,9 +62,9 @@ public class Doubt {
 
         List<String> last = field.peekLast().getCards();
 
-        boolean result = last.stream().allMatch(e -> Objects.equals(e.split("_")[1], ordered[turn % 13]));
+        boolean result = last.stream().allMatch(e -> Objects.equals(e.split("_")[1], ordered[(turn-1) % 13]));
 
-        dr.setLastCards(last);
+        dr.setLastCards(List.copyOf(last));
 
         if(!result){
             dr.setResult(false);
@@ -83,8 +84,21 @@ public class Doubt {
             dr.setPlayerId(player.getId());
         }
         field.clear();
-        last.clear();
 
         return dr;
+    }
+
+    public GameStatus getStatus() {
+        return GameStatus.builder()
+                .field(this.field)
+                .players(this.players)
+                .build();
+    }
+
+    public void gameStart(String userId, ArrayList<String> cards) {
+        CardList cl = new CardList();
+        cl.setCards(cards);
+        cards.forEach(System.out::println);
+        players.get(0).gainCard(List.of(cl));
     }
 }

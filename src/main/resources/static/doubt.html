@@ -30,6 +30,9 @@
         <div class="BtnField">
             <button id="SendBtn" class="SendBtn" onclick="sendCard()">카드 내기</button>
             <button onclick="gameStart()">게임 시작</button>
+
+            <button onclick="sendCard()"> sendCardTest </button>
+            <button onclick="doubt()"> DoubtTest </button>
         </div>
 
         <div id="Hands" class="Hands">
@@ -51,14 +54,18 @@
 
     let getMessage = {
         "START" : (data) => {
-            if(data )
-
             getHands(JSON.parse(data));
-    },
+        },
         "PLAY" : (data) => {
             console.log(data);
         },
         "ERROR" : (data) => {
+            console.log(data);
+        },
+        "SEND" : (data) => {
+            console.log(data);
+        },
+        "DOUBT" : (data) => {
             console.log(data);
         }
     }
@@ -74,16 +81,18 @@
             stompClient.subscribe(`/topic/game-room/${params.roomId}`, (msg) => {
                 let data = JSON.parse(msg.body);
                 console.log(data);
+                console.log(data.type + "::::::::");
                 getMessage[data.type](data.value);
+                console.log("END :::::::::::")
             });
 
-            stompClient.send(`/message/play/${params.roomId}`, {} ,JSON.stringify({"type" : "PLAY" , "value" : "testMessage"}))
+            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "userId" : "player1" , "value" : "이름"}))
         },(error)=>{console.log(error)});
     }
 
 
     function gameStart(){
-        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "name" : "player1"}));
+        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "userId" : "player1"}));
     }
 
 </script>

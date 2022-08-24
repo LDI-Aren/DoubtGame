@@ -3,6 +3,7 @@ package com.bg.doubt.Player;
 import com.bg.doubt.card.CardList;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -14,6 +15,7 @@ public class Player {
     private List<String> cards;
 
     public Player(String name, String id) {
+        this.cards = new ArrayList<>();
         this.name = name;
         this.id = id;
     }

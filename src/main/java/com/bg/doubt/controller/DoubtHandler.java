@@ -51,9 +51,10 @@ public class DoubtHandler {
     public GameMessage sendCard(GameMessage msg, @DestinationVariable("roomId") String roomId){
         doubtService.sendCard(msg, roomId);
         return msg;
+
     }
 
-    @MessageMapping("/send/{roomId}")
+    @MessageMapping("/doubt/{roomId}")
     @SendTo("/topic/game-room/{roomId}")
     public GameMessage callDoubt(GameMessage msg, @DestinationVariable("roomId") String roomId){
         doubtService.callDoubt(msg, roomId);

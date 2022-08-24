@@ -1,6 +1,7 @@
 package com.bg.doubt.controller;
 
 import com.bg.doubt.doubt.DoubtService;
+import com.bg.doubt.doubt.GameStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -65,5 +66,11 @@ public class MainController {
         log.info("Created roomId : " + roomId);
 
         return  roomId;
+    }
+
+    @GetMapping("/check/gameBoard/{id}")
+    @ResponseBody
+    public GameStatus aa(@PathVariable String id){
+        return doubtService.getGameStatus(id);
     }
 }

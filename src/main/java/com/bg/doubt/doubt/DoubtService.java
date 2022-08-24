@@ -51,8 +51,10 @@ public class DoubtService {
 
     public void canStartGame(GameMessage msg, String roomId) {
 
-        if("1230".length() > 0){
-            msg.setValue(gson.toJson(CardSetter.getCards(13)));
+        if(true){
+            ArrayList<String> cards = CardSetter.getCards(13);
+            gameRooms.get(roomId).gameStart(msg.getUserId(), cards);
+            msg.setValue(gson.toJson(cards));
             return;
         }
 
@@ -80,12 +82,13 @@ public class DoubtService {
             return;
         }
 
-        gameRooms.get(roomId).join(new Player(msg.getUserId(), "id"));
+        gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getUserId()));
         msg.setValue("t");
     }
 
     public void sendCard(GameMessage msg, String roomId) {
-        CardList cards = gson.fromJson(msg.getValue(),CardList.class);
+        CardList cards = new CardList();
+        cards.setCards(gson.fromJson(msg.getValue(),LinkedList.class));
 
         if(!gameRooms.containsKey(roomId)){
             setErrorMessage(msg, "게임방이 존재하지 않습니다.");
@@ -116,5 +119,10 @@ public class DoubtService {
 
         DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getUserId());
         msg.setValue(gson.toJson(dr));
+    }
+
+    public GameStatus getGameStatus(String id) {
+        Doubt game = gameRooms.get(id);
+        return game.getStatus();
     }
 }

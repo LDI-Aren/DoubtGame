@@ -143,15 +143,11 @@ function getHands(list){
 function sendCard(){
     let cardNames = hands.removeClickedHands();
 
+    stompClient.send(`/message/send/${params.roomId}`,{}, JSON.stringify({"type" : "SEND" , "userId" : "player1", "value" : JSON.stringify(cardNames)}));
+
     console.log(JSON.stringify(cardNames));
+}
 
-    let option = {
-        method : "post",
-        headers : {
-            "Content-type" : "application/json; charset=utf-8"
-        },
-        body : JSON.stringify(cardNames)
-    }
-
-    fetch("/sendCard", option);
+function doubt(){
+    stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "userId" : "player1"}));
 }
