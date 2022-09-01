@@ -49,26 +49,40 @@ public class DoubtService {
                 .collect(Collectors.toList());
     }
 
-    public void canStartGame(GameMessage msg, String roomId) {
+    public List<GameMessage> canStartGame(GameMessage msg, String roomId) {
 
-        if(true){
-            ArrayList<String> cards = CardSetter.getCards(13);
-            gameRooms.get(roomId).gameStart(msg.getUserId(), cards);
-            msg.setValue(gson.toJson(cards));
-            return;
-        }
-
+        /*
         if(!gameRooms.containsKey(roomId)){
             setErrorMessage(msg, "게임방이 존재하지 않습니다.");
-            return;
+            return null;
         }
 
-        if(gameRooms.get(roomId).numberOfPlayer() != 4){
+        if(gameRooms.get(roomId).numberOfPlayer() < 4){
             setErrorMessage(msg, "게임을 시작하기 위한 인원이 부족합니다.");
-            return;
+            return null;
+        }
+        */
+
+        Map<String, CardList> hands;
+
+        try {
+            hands = gameRooms.get(roomId).gameStart();
+        } catch (Exception e) {
+            setErrorMessage(msg, "모두 레디상태여야합니다.");
+            return null;
         }
 
-        msg.setValue(gson.toJson(CardSetter.getCards(13)));
+        List<GameMessage> result = new ArrayList<>();
+        hands.forEach((k,v)->{
+            result.add(
+                    GameMessage.builder()
+                            .type(MessageType.START)
+                            .userId(k)
+                            .value(gson.toJson(v.getCards()))
+                            .build());
+        });
+
+        return result;
     }
 
     public void joinPlayer(GameMessage msg, String roomId) {
@@ -82,7 +96,13 @@ public class DoubtService {
             return;
         }
 
-        gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getUserId()));
+        try {
+            gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getUserId()));
+        } catch (Exception e) {
+            setErrorMessage(msg, e.getMessage());
+            return;
+        }
+
         msg.setValue("t");
     }
 
@@ -95,10 +115,12 @@ public class DoubtService {
             return;
         }
 
-        Player nextPlayer = gameRooms.get(roomId).sendCard(cards);
+        Player nextPlayer = null;
 
-        if(nextPlayer == null){
-            setErrorMessage(msg, "존재하지 않는 플레이어 입니다.");
+        try {
+            nextPlayer = gameRooms.get(roomId).sendCard(msg.getUserId(),cards);
+        } catch (Exception e) {
+            setErrorMessage(msg, e.getMessage());
             return;
         }
 
@@ -124,5 +146,14 @@ public class DoubtService {
     public GameStatus getGameStatus(String id) {
         Doubt game = gameRooms.get(id);
         return game.getStatus();
+    }
+
+    public void gameReady(GameMessage msg, String roomId) {
+        if(!gameRooms.containsKey(roomId)){
+            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
+            return;
+        }
+
+        gameRooms.get(roomId).gameReady(msg.getUserId(), msg.getValue());
     }
 }

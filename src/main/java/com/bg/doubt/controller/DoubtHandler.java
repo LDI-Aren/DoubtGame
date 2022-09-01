@@ -39,6 +39,14 @@ public class DoubtHandler {
         return msg;
     }
 
+    @MessageMapping("/ready/{roomId}")
+    @SendTo("/topic/game-room/{roomId}")
+    public GameMessage ready(GameMessage msg , @DestinationVariable("roomId") String roomId){
+
+        doubtService.gameReady(msg, roomId);
+        return msg;
+    }
+
     @MessageMapping("/start/{roomId}")
     @SendTo("/topic/game-room/{roomId}")
     public GameMessage startGame(GameMessage msg, @DestinationVariable("roomId") String roomId){

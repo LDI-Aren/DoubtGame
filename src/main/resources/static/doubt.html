@@ -28,11 +28,10 @@
         </div>
 
         <div class="BtnField">
-            <button id="SendBtn" class="SendBtn" onclick="sendCard()">카드 내기</button>
-            <button onclick="gameStart()">게임 시작</button>
-
-            <button onclick="sendCard()"> sendCardTest </button>
-            <button onclick="doubt()"> DoubtTest </button>
+            <button id="sBtn" class="blueBtn playBtn d-none" onclick="sendCard()">카드 내기</button>
+            <button id="dBtn" class="redBtn playBtn d-none" onclick="doubt()">다우트</button>
+            <button id="rBtn" class="blueBtn playBtn" onclick="gameReady()">준비</button>
+            <button id="rcBtn" class="grayBtn playBtn d-none" onclick="readyCancle()">준비완료</button>
         </div>
 
         <div id="Hands" class="Hands">
@@ -93,6 +92,18 @@
 
     function gameStart(){
         stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "userId" : "player1"}));
+    }
+
+    function gameReady(){
+        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "userId" : "player1" , "value" : "true"}));
+        rBtn.classList.add("d-none");
+        rcBtn.classList.remove("d-none");
+    }
+
+    function readyCancle(){
+        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "userId" : "player1" , "value" : "false"}));
+        rBtn.classList.remove("d-none");
+        rcBtn.classList.add("d-none");
     }
 
 </script>

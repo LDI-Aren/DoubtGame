@@ -2,20 +2,23 @@ package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
 import com.bg.doubt.card.CardList;
+import com.bg.doubt.card.CardSetter;
 
 import java.util.*;
 
 public class Doubt {
     private String roomName;
-    private ArrayList<Player> players;
-    private LinkedList<CardList> field;
+    private final Map<String, Player> players;
+    private final LinkedList<CardList> field;
+    private final ArrayList<String> playerList;
     private int turn;
 
-    private static String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
+    private static final String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
     public Doubt() {
-        this.players = new ArrayList();
+        this.players = new HashMap<>();
         this.field = new LinkedList<>();
+        this.playerList = new ArrayList<>();
         turn = 0;
     }
 
@@ -31,18 +34,23 @@ public class Doubt {
         return players.size();
     }
 
-    public void join(Player player){
+    public void join(Player player) throws Exception {
         if(players.size() >= 4){
-            return;
+            throw new Exception("Player already full");
         }
 
-        players.add(player);
+        playerList.add(player.getId());
+        players.put(player.getId(), player);
     }
 
-    public Player sendCard(CardList inputCards){
-        Player player =  players.get(turn%players.size());
+    public Player sendCard(String playerId ,CardList inputCards) throws Exception {
+        Player player =  players.get(playerId);
         if(player == null){
-            return null;
+            throw new Exception("Player Not Found");
+        }
+
+        if(!player.getId().equals(playerId)){
+            throw new Exception("Player MisMatch");
         }
 
         int result = player.sendCards(inputCards);
@@ -54,7 +62,7 @@ public class Doubt {
 
         turn++;
 
-        return players.get(turn%players.size());
+        return players.get(playerId);
     }
 
     public DoubtResult callDoubt(String playerId){
@@ -66,23 +74,16 @@ public class Doubt {
 
         dr.setLastCards(List.copyOf(last));
 
-        if(!result){
-            dr.setResult(false);
-            dr.setPlayerId(playerId);
-            players.stream()
-                    .filter(e->e.getId().equals(playerId))
-                    .findFirst()
-                    .ifPresent(e->{
-                        e.gainCard(field);
-                    });
+        Player player;
+        if(result){
+            player = players.get(playerList.get((turn-1)%4));
         } else {
-            dr.setResult(true);
-
-            Player player = players.get((turn-1)%players.size());
-            player.gainCard(field);
-
-            dr.setPlayerId(player.getId());
+            player = players.get(playerId);
         }
+
+        dr.setResult(result);
+        player.gainCard(field);
+        dr.setPlayerId(player.getId());
         field.clear();
 
         return dr;
@@ -95,10 +96,28 @@ public class Doubt {
                 .build();
     }
 
-    public void gameStart(String userId, ArrayList<String> cards) {
-        CardList cl = new CardList();
-        cl.setCards(cards);
-        cards.forEach(System.out::println);
-        players.get(0).gainCard(List.of(cl));
+    public Map<String, CardList> gameStart() throws Exception {
+        boolean ready = players.entrySet().stream().allMatch(e -> e.getValue().isReady());
+
+        if(!ready){
+            throw new Exception("Not All Ready");
+        }
+
+        Map<String, CardList> hands = new HashMap<>();
+
+        players.forEach((k,v) -> {
+            CardList cl = new CardList();
+            cl.setCards(CardSetter.getCards(13));
+
+            v.gainCard(List.of(cl));
+
+            hands.put(k,cl);
+        });
+
+        return hands;
+    }
+
+    public void gameReady(String userId, String value) {
+        players.get(userId).doReady(Boolean.parseBoolean(value));
     }
 }

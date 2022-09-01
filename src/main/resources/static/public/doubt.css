@@ -50,15 +50,32 @@ body{
   height:60%;
 }
 
-.SendBtn{
+.blueBtn{
   border: 0px;
   height: 100%;
   width: 30%;
   background-color: aquamarine;
 }
 
-.SendBtn:hover{
-  opacity: 0.7;
+.redBtn{
+  border: 0px;
+  height: 100%;
+  width: 30%;
+  background-color: firebrick;
+}
+
+.grayBtn{
+  border: 0px;
+  height: 100%;
+  width: 30%;
+  background-color: gray;
+}
+
+.blueBtn{
+  border: 0px;
+  height: 100%;
+  width: 30%;
+  background-color: aquamarine;
 }
 
 .BtnField{
@@ -71,6 +88,10 @@ body{
   height:0.5%;
 }
 
-.dNone{
+.d-none{
   display: none;
+}
+
+.playBtn:hover {
+  opacity: 0.7;
 }
