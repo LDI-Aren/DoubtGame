@@ -1,18 +1,15 @@
 package com.bg.doubt.controller;
 
 import com.bg.doubt.doubt.DoubtService;
-import com.bg.doubt.doubt.GameStatus;
+import com.bg.doubt.gameMessage.GameStatus;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 @Controller
 @Slf4j

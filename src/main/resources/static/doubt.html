@@ -85,23 +85,23 @@
                 console.log("END :::::::::::")
             });
 
-            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "userId" : "player1" , "value" : "이름"}))
+            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : "player1" , "value" : "이름"}))
         },(error)=>{console.log(error)});
     }
 
 
     function gameStart(){
-        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "userId" : "player1"}));
+        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "playerId" : "player1"}));
     }
 
     function gameReady(){
-        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "userId" : "player1" , "value" : "true"}));
+        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : "player1" , "value" : "true"}));
         rBtn.classList.add("d-none");
         rcBtn.classList.remove("d-none");
     }
 
     function readyCancle(){
-        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "userId" : "player1" , "value" : "false"}));
+        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : "player1" , "value" : "false"}));
         rBtn.classList.remove("d-none");
         rcBtn.classList.add("d-none");
     }

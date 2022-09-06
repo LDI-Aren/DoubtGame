@@ -1,4 +1,4 @@
-package com.bg.doubt.doubt;
+package com.bg.doubt.gameMessage;
 
 import com.bg.doubt.Player.Player;
 import com.bg.doubt.card.CardList;
@@ -15,6 +15,6 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 public class GameStatus {
-    Map<String, Player> players;
+    List<Player> players;
     List<CardList> field;
 }

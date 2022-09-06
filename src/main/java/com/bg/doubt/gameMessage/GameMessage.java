@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class GameMessage {
     MessageType type;
-    String userId;
+    String playerId;
     String value;
 }

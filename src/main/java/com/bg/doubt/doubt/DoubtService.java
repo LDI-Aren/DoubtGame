@@ -2,10 +2,11 @@ package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
 import com.bg.doubt.card.CardList;
-import com.bg.doubt.card.CardSetter;
 import com.bg.doubt.controller.RoomElement;
 import com.bg.doubt.gameMessage.GameMessage;
+import com.bg.doubt.gameMessage.GameStatus;
 import com.bg.doubt.gameMessage.MessageType;
+import com.bg.doubt.gameMessage.RoomStatus;
 import com.google.gson.Gson;
 import org.springframework.stereotype.Service;
 
@@ -49,98 +50,60 @@ public class DoubtService {
                 .collect(Collectors.toList());
     }
 
-    public List<GameMessage> canStartGame(GameMessage msg, String roomId) {
+    public RoomStatus startGame(GameMessage msg, String roomId) throws Exception {
 
         /*
         if(!gameRooms.containsKey(roomId)){
-            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
-            return null;
+            throw new Exception("게임방이 존재하지 않습니다.");
         }
 
         if(gameRooms.get(roomId).numberOfPlayer() < 4){
-            setErrorMessage(msg, "게임을 시작하기 위한 인원이 부족합니다.");
-            return null;
+            throw new Exception("게임방을 시작하기 위한 인원이 부족합니다.");
         }
         */
 
-        Map<String, CardList> hands;
+        Doubt gameRoom = gameRooms.get(roomId);
+        gameRoom.gameStart();
 
-        try {
-            hands = gameRooms.get(roomId).gameStart();
-        } catch (Exception e) {
-            setErrorMessage(msg, "모두 레디상태여야합니다.");
-            return null;
-        }
-
-        List<GameMessage> result = new ArrayList<>();
-        hands.forEach((k,v)->{
-            result.add(
-                    GameMessage.builder()
-                            .type(MessageType.START)
-                            .userId(k)
-                            .value(gson.toJson(v.getCards()))
-                            .build());
-        });
-
-        return result;
+        return gameRoom.getRoomStatusByPlayerId(msg.getPlayerId());
     }
 
-    public void joinPlayer(GameMessage msg, String roomId) {
+    public RoomStatus joinPlayer(GameMessage msg, String roomId) throws Exception {
         if(!gameRooms.containsKey(roomId)){
-            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
-            return;
+            throw new Exception("게임방이 존재하지 않습니다.");
         }
 
         if(gameRooms.get(roomId).numberOfPlayer() >= 4){
-            setErrorMessage(msg, "방안에 인원이 꽉 찼습니다.");
-            return;
+            throw new Exception("방에 인원이 가득 찼습니다.");
         }
 
-        try {
-            gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getUserId()));
-        } catch (Exception e) {
-            setErrorMessage(msg, e.getMessage());
-            return;
-        }
+        RoomStatus rs = gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getPlayerId()));
 
-        msg.setValue("t");
+        return rs;
     }
 
-    public void sendCard(GameMessage msg, String roomId) {
+    public RoomStatus sendCard(GameMessage msg, String roomId) throws Exception {
         CardList cards = new CardList();
         cards.setCards(gson.fromJson(msg.getValue(),LinkedList.class));
 
         if(!gameRooms.containsKey(roomId)){
-            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
-            return;
+            throw new Exception("게임방이 존재하지 않습니다.");
         }
 
         Player nextPlayer = null;
 
-        try {
-            nextPlayer = gameRooms.get(roomId).sendCard(msg.getUserId(),cards);
-        } catch (Exception e) {
-            setErrorMessage(msg, e.getMessage());
-            return;
-        }
+        RoomStatus rs = gameRooms.get(roomId).sendCard(msg.getPlayerId(),cards);
 
-        List<String> value = List.of(nextPlayer.getName(), String.valueOf(cards.getCards().size()));
-        msg.setValue(gson.toJson(value));
+        return rs;
     }
 
-    private void setErrorMessage(GameMessage msg, String value){
-            msg.setType(MessageType.ERROR);
-            msg.setValue(value);
-    }
-
-    public void callDoubt(GameMessage msg, String roomId) {
+    public DoubtResult callDoubt(GameMessage msg, String roomId) throws Exception {
         if(!gameRooms.containsKey(roomId)){
-            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
-            return;
+            throw new Exception("게임방이 존재하지 않습니다.");
         }
 
-        DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getUserId());
-        msg.setValue(gson.toJson(dr));
+        DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getPlayerId());
+        return dr;
     }
 
     public GameStatus getGameStatus(String id) {
@@ -148,12 +111,13 @@ public class DoubtService {
         return game.getStatus();
     }
 
-    public void gameReady(GameMessage msg, String roomId) {
+    public String gameReady(GameMessage msg, String roomId) throws Exception {
         if(!gameRooms.containsKey(roomId)){
-            setErrorMessage(msg, "게임방이 존재하지 않습니다.");
-            return;
+            throw new Exception("게임방이 존재하지 않습니다.");
         }
 
-        gameRooms.get(roomId).gameReady(msg.getUserId(), msg.getValue());
+        boolean isReady = gameRooms.get(roomId).gameReady(msg.getPlayerId(), msg.getValue());
+
+        return String.valueOf(isReady);
     }
 }

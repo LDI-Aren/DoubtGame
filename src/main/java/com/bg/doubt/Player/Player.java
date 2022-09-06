@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
@@ -17,11 +16,15 @@ public class Player {
     private List<String> cards;
     private boolean ready;
 
+    public static Player EmptyPlayer;
+
     public Player(String name, String id) {
         this.cards = new ArrayList<>();
         this.name = name;
         this.id = id;
         ready = false;
+
+        EmptyPlayer = new Player();
     }
 
     public void doReady(boolean ready){

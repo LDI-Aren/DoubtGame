@@ -3,22 +3,23 @@ package com.bg.doubt.doubt;
 import com.bg.doubt.Player.Player;
 import com.bg.doubt.card.CardList;
 import com.bg.doubt.card.CardSetter;
+import com.bg.doubt.gameMessage.GameStatus;
+import com.bg.doubt.gameMessage.RoomStatus;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Doubt {
     private String roomName;
-    private final Map<String, Player> players;
+    private final ArrayList<Player> players;
     private final LinkedList<CardList> field;
-    private final ArrayList<String> playerList;
     private int turn;
 
     private static final String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
     public Doubt() {
-        this.players = new HashMap<>();
+        this.players = new ArrayList<>();
         this.field = new LinkedList<>();
-        this.playerList = new ArrayList<>();
         turn = 0;
     }
 
@@ -34,17 +35,44 @@ public class Doubt {
         return players.size();
     }
 
-    public void join(Player player) throws Exception {
+    private Player findPlayerById(String playerId){
+        for (Player player : players) {
+            if(player.getId().equals(playerId)){
+                return player;
+            }
+        }
+
+        return Player.EmptyPlayer;
+    }
+
+    private RoomStatus rsMaker(String playerId){
+        int topCards = 0;
+
+        if(!field.isEmpty()){
+            topCards = field.peekLast().getCards().size();
+        }
+
+        return RoomStatus.builder()
+                .playerAndCards(players.stream()
+                        .collect(Collectors.toMap(Player::getId, p -> p.getCards().size()))
+                )
+                .FieldNum(topCards)
+                .cards(findPlayerById(playerId).getCards())
+                .build();
+    }
+
+    public RoomStatus join(Player player) throws Exception {
         if(players.size() >= 4){
             throw new Exception("Player already full");
         }
 
-        playerList.add(player.getId());
-        players.put(player.getId(), player);
+        players.add(player);
+
+        return rsMaker(player.getId());
     }
 
-    public Player sendCard(String playerId ,CardList inputCards) throws Exception {
-        Player player =  players.get(playerId);
+    public RoomStatus sendCard(String playerId ,CardList inputCards) throws Exception {
+        Player player =  findPlayerById(playerId);
         if(player == null){
             throw new Exception("Player Not Found");
         }
@@ -62,7 +90,7 @@ public class Doubt {
 
         turn++;
 
-        return players.get(playerId);
+        return rsMaker(playerId);
     }
 
     public DoubtResult callDoubt(String playerId){
@@ -76,9 +104,9 @@ public class Doubt {
 
         Player player;
         if(result){
-            player = players.get(playerList.get((turn-1)%4));
+            player = players.get((turn-1)%4);
         } else {
-            player = players.get(playerId);
+            player = findPlayerById(playerId);
         }
 
         dr.setResult(result);
@@ -89,6 +117,7 @@ public class Doubt {
         return dr;
     }
 
+    /* test용 게임의 전체 상태를 나타냄 */
     public GameStatus getStatus() {
         return GameStatus.builder()
                 .field(this.field)
@@ -96,28 +125,29 @@ public class Doubt {
                 .build();
     }
 
-    public Map<String, CardList> gameStart() throws Exception {
-        boolean ready = players.entrySet().stream().allMatch(e -> e.getValue().isReady());
+    public void gameStart() throws Exception {
+        boolean ready = players.stream().allMatch(Player::isReady);
 
         if(!ready){
             throw new Exception("Not All Ready");
         }
 
-        Map<String, CardList> hands = new HashMap<>();
-
-        players.forEach((k,v) -> {
+        players.forEach((k) -> {
             CardList cl = new CardList();
             cl.setCards(CardSetter.getCards(13));
 
-            v.gainCard(List.of(cl));
-
-            hands.put(k,cl);
+            k.gainCard(List.of(cl));
         });
-
-        return hands;
     }
 
-    public void gameReady(String userId, String value) {
-        players.get(userId).doReady(Boolean.parseBoolean(value));
+    public boolean gameReady(String playerId, String value) {
+        Player player = findPlayerById(playerId);
+        player.doReady(Boolean.parseBoolean(value));
+
+        return player.isReady();
+    }
+
+    public RoomStatus getRoomStatusByPlayerId(String playerId) {
+        return rsMaker(playerId);
     }
 }
