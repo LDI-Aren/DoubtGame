@@ -4,22 +4,21 @@ import com.bg.doubt.card.CardList;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Data
 @NoArgsConstructor
 public class Player {
     private String name;
     private String id;
-    private List<String> cards;
+    private CardList cards;
     private boolean ready;
 
     public static Player EmptyPlayer;
 
+
     public Player(String name, String id) {
-        this.cards = new ArrayList<>();
+        this.cards = new CardList();
         this.name = name;
         this.id = id;
         ready = false;
@@ -35,31 +34,27 @@ public class Player {
         return ready;
     }
 
+    public PlayerAndCard getInfo(){
+        return new PlayerAndCard(id, cards.getSize());
+    }
+
+    public List<String> getCards(){
+        return cards.getCards();
+    }
+
     public int sendCards(CardList inputCards){
-        AtomicBoolean result = new AtomicBoolean(true);
-
-        inputCards.getCards().forEach(e->{
-            if(!cards.contains(e)){
-                result.set(false);
-            } else {
-                cards.remove(e);
-            }
-        });
-
-        if(!result.get()){
+        if(cards.removeCard(inputCards)){
             return -1;
         }
 
-        return inputCards.getCards().size();
+        return inputCards.getSize();
     }
 
-    public void gainCard(List<CardList> inputCards){
-        if(inputCards.isEmpty()){
-            return;
+    public int gainCard(List<CardList> inputCards){
+        if(!inputCards.isEmpty()){
+            cards.addCards(inputCards);
         }
 
-        inputCards.forEach(list -> {
-            cards.addAll(list.getCards());
-        });
+        return cards.getSize();
     }
 }

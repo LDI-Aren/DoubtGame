@@ -1,13 +1,14 @@
 package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
+import com.bg.doubt.Player.PlayerAndCard;
 import com.bg.doubt.card.CardList;
 import com.bg.doubt.card.CardSetter;
 import com.bg.doubt.gameMessage.GameStatus;
 import com.bg.doubt.gameMessage.RoomStatus;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.regex.Pattern;
 
 public class Doubt {
     private String roomName;
@@ -45,19 +46,19 @@ public class Doubt {
         return Player.EmptyPlayer;
     }
 
-    private RoomStatus rsMaker(String playerId){
+    private RoomStatus getRoomState(String playerId){
         int topCards = 0;
 
         if(!field.isEmpty()){
-            topCards = field.peekLast().getCards().size();
+            topCards = field.peekLast().getSize();
         }
 
         return RoomStatus.builder()
                 .playerAndCards(players.stream()
-                        .collect(Collectors.toMap(Player::getId, p -> p.getCards().size()))
-                )
+                        .map(Player::getInfo)
+                        .toArray(PlayerAndCard[]::new))
                 .FieldNum(topCards)
-                .cards(findPlayerById(playerId).getCards())
+                .myCards(findPlayerById(playerId).getCards())
                 .build();
     }
 
@@ -68,7 +69,7 @@ public class Doubt {
 
         players.add(player);
 
-        return rsMaker(player.getId());
+        return getRoomState(player.getId());
     }
 
     public RoomStatus sendCard(String playerId ,CardList inputCards) throws Exception {
@@ -90,30 +91,39 @@ public class Doubt {
 
         turn++;
 
-        return rsMaker(playerId);
+        return getRoomState(playerId);
+    }
+
+    private boolean isMatch(List<String> last){
+        String pattern = ordered[(turn-1) % 13];
+
+        String regex = "^.+_" + pattern;
+
+        return last.stream().allMatch(e -> e.matches(regex));
+    }
+
+    private Player getLosePlayer(boolean result, String playerId){
+        if(result){
+            return players.get((turn-1)%4);
+        }
+
+        return findPlayerById(playerId);
     }
 
     public DoubtResult callDoubt(String playerId){
         DoubtResult dr = new DoubtResult();
 
         List<String> last = field.peekLast().getCards();
-
-        boolean result = last.stream().allMatch(e -> Objects.equals(e.split("_")[1], ordered[(turn-1) % 13]));
-
         dr.setLastCards(List.copyOf(last));
 
-        Player player;
-        if(result){
-            player = players.get((turn-1)%4);
-        } else {
-            player = findPlayerById(playerId);
-        }
+        boolean result = isMatch(last);
+        Player player = getLosePlayer(result, playerId);
+        player.gainCard(field);
 
         dr.setResult(result);
-        player.gainCard(field);
         dr.setPlayerId(player.getId());
-        field.clear();
 
+        field.clear();
         return dr;
     }
 
@@ -148,6 +158,6 @@ public class Doubt {
     }
 
     public RoomStatus getRoomStatusByPlayerId(String playerId) {
-        return rsMaker(playerId);
+        return getRoomState(playerId);
     }
 }
