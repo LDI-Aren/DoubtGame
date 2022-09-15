@@ -14,7 +14,7 @@ public class Player {
     private CardList cards;
     private boolean ready;
 
-    public static Player EmptyPlayer;
+    public static Player EmptyPlayer = new Player();
 
 
     public Player(String name, String id) {
@@ -22,8 +22,6 @@ public class Player {
         this.name = name;
         this.id = id;
         ready = false;
-
-        EmptyPlayer = new Player();
     }
 
     public void doReady(boolean ready){

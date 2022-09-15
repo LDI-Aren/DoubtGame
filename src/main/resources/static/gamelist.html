@@ -8,6 +8,10 @@
     <input type="text" id="roomName">
     <button onclick="createGameroom()">게임방 만들기</button>
 
+    <hr>
+    <input type="text" id = "playerId" placeholder="아이디">
+    <hr>
+
     <ui id = "roomList">
 
     </ui>
@@ -27,11 +31,45 @@
                         let li = document.createElement("li");
                         li.innerText = `${a.gameName} --- ${a.roomName} : ${a.roomId}`;
 
-                        li.onclick = ()=> location.href = `/games/${a.gameName}/rooms?roomId=${a.roomId}`;
+                        li.onclick = () => gameRoomClick(a.gameName, a.roomId);
                         roomList.appendChild(li);
                     })
                 }
             );
+    }
+
+    async function gameRoomClick(gameName, roomId) {
+        let playerId = document.getElementById("playerId").value;
+
+        if (playerId === "") {
+            return;
+        }
+
+        let isDuplicate = await duplicateCheck(playerId, roomId);
+
+        console.log(isDuplicate);
+
+        if (isDuplicate === 'true') {
+            console.log("in If")
+            return;
+        }
+        console.log("out If")
+
+        location.href = `/games/${gameName}/rooms?roomId=${roomId}&playerId=${playerId}`
+    }
+
+    function duplicateCheck(playerId, roomId){
+        return fetch(`games/doubt/rooms/${roomId}?playerId=${playerId}`,{
+            method : "get",
+            headers : {
+                "content-type" : "application/json; charset=utf-8"
+            }
+        })
+        .then(res=>res.json())
+        .then(data=>{
+            console.log(data);
+            return data.result
+        })
     }
 
     function createGameroom(){

@@ -120,4 +120,12 @@ public class DoubtService {
 
         return String.valueOf(isReady);
     }
+
+    public boolean isDuplicate(String roomId, String playerId) {
+        if(!gameRooms.containsKey(roomId)){
+            return true;
+        }
+
+        return gameRooms.get(roomId).isDuplicate(playerId);
+    }
 }

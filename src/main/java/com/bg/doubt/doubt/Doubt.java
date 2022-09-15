@@ -160,4 +160,8 @@ public class Doubt {
     public RoomStatus getRoomStatusByPlayerId(String playerId) {
         return getRoomState(playerId);
     }
+
+    public boolean isDuplicate(String playerId) {
+        return !findPlayerById(playerId).equals(Player.EmptyPlayer);
+    }
 }

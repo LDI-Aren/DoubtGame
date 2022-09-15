@@ -65,6 +65,15 @@ public class MainController {
         return  roomId;
     }
 
+    @GetMapping("/games/{gameName}/rooms/{roomId}")
+    @ResponseBody
+    public String createGameroom(@PathVariable("gameName") String gameName, @PathVariable("roomId") String roomId, String playerId){
+
+        boolean result = doubtService.isDuplicate(roomId, playerId);
+
+        return String.format("{\"result\":\"%s\"}", result);
+    }
+
     @GetMapping("/check/gameBoard/{id}")
     @ResponseBody
     public GameStatus aa(@PathVariable String id){
