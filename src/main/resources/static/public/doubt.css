@@ -1,5 +1,5 @@
 body{
-  margin : 0px;
+  margin : 0;
 }
 
 .Header{
@@ -24,7 +24,7 @@ body{
 }
 
 .ClickedHand{
-  margin: 0px;
+  margin: 0;
 }
 
 .ClickedHand>img{
@@ -44,6 +44,11 @@ body{
   display: flex;
   justify-content: space-around;
   height: 10%;
+  color : wheat;
+}
+
+.Empty{
+  color : black;
 }
 
 .GameField{
@@ -51,28 +56,28 @@ body{
 }
 
 .blueBtn{
-  border: 0px;
+  border: 0;
   height: 100%;
   width: 30%;
   background-color: aquamarine;
 }
 
 .redBtn{
-  border: 0px;
+  border: 0;
   height: 100%;
   width: 30%;
   background-color: firebrick;
 }
 
 .grayBtn{
-  border: 0px;
+  border: 0;
   height: 100%;
   width: 30%;
   background-color: gray;
 }
 
 .blueBtn{
-  border: 0px;
+  border: 0;
   height: 100%;
   width: 30%;
   background-color: aquamarine;

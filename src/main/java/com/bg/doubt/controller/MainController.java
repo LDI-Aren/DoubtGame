@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
 
@@ -35,9 +36,9 @@ public class MainController {
         return mav;
     }
 
-    @GetMapping("/games/{gameName}/rooms/list")
+    @GetMapping("/rooms/list")
     @ResponseBody
-    public List<RoomElement> getGamerooms(@PathVariable("gameName") String gameName){
+    public List<RoomElement> getGamerooms(){
 
         List<RoomElement> roomList = doubtService.getRoomList();
 
@@ -47,7 +48,7 @@ public class MainController {
     @GetMapping("/games/{gameName}/rooms")
     public String getGameroomByRoomId(@PathVariable("gameName") String gameName, String roomId){
         if(doubtService.findRoomByRoomId(roomId).isEmpty()){
-            return  "/" + gameName + ".html";
+            return  "/gamelist.html";
         }
 
         return  "/" + gameName + ".html";

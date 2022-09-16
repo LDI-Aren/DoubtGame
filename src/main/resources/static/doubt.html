@@ -9,14 +9,15 @@
     <link rel="stylesheet" href="/public/doubt.css">
 </head>
 <script src="/public/doubt.js"></script>
+<script src="/public/Player.js"></script>
 
 <body>
     <div class="Field">
 
-        <div class="Players">
-            <div class="Player">Player1</div>
-            <div class="Player">Player2</div>
-            <div class="Player">Player3</div>
+        <div id="Players" class="Players">
+            <div class="Player Empty">Player1</div>
+            <div class="Player Empty">Player2</div>
+            <div class="Player Empty">Player3</div>
         </div>
 
         <div class="GameField">
@@ -27,11 +28,11 @@
 
         </div>
 
-        <div class="BtnField">
+        <div id="Status" class="BtnField">
             <button id="sBtn" class="blueBtn playBtn d-none" onclick="sendCard()">카드 내기</button>
             <button id="dBtn" class="redBtn playBtn d-none" onclick="doubt()">다우트</button>
             <button id="rBtn" class="blueBtn playBtn" onclick="gameReady()">준비</button>
-            <button id="rcBtn" class="grayBtn playBtn d-none" onclick="readyCancle()">준비완료</button>
+            <button id="rcBtn" class="grayBtn playBtn d-none" onclick="readyCancel()">준비완료</button>
         </div>
 
         <div id="Hands" class="Hands">
@@ -40,7 +41,7 @@
 
     </div>
 
-    <div id="imageStore" class="dNone"></div>
+    <div id="imageStore" class="d-none"></div>
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.4.0/sockjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
@@ -50,27 +51,41 @@
     });
     let socket;
     let stompClient;
+    let playerId = params.playerId;
+    let playerManager = new PlayerManager(document.getElementById("Players"), playerId);
 
     let getMessage = {
-        "START" : (data) => {
+        "START" : (id, data) => {
             getHands(JSON.parse(data));
         },
-        "PLAY" : (data) => {
+        "JOIN" : (id, data) => {
+            console.log(id + " 님이 입장했습니다.");
+            playerManager.joinPlayer(id, "name");
+        },
+        "READY" : (id, data) => {
+            console.log(id + JSON.parse(data)?" : Ready":" : Cancel");
+            toggleReadyState(id, data);
+        },
+        "ERROR" : (id, data) => {
             console.log(data);
         },
-        "ERROR" : (data) => {
+        "SEND" : (id, data) => {
             console.log(data);
         },
-        "SEND" : (data) => {
-            console.log(data);
-        },
-        "DOUBT" : (data) => {
+        "DOUBT" : (id, data) => {
             console.log(data);
         }
     }
 
 
     window.onload = () => {
+
+        if(playerId === undefined){
+            location.href = "/";
+        }
+
+        console.log("playerId : " + playerId);
+
         CardInit();
 
         socket = SockJS('/connect');
@@ -85,23 +100,35 @@
                 console.log("END :::::::::::")
             });
 
-            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : "player1" , "value" : "이름"}))
+            stompClient.subscribe(`/topic/player/${playerId}`, (msg) => {
+                let data = JSON.parse(msg.body);
+                console.log(data);
+                console.log(data.type + "::::::::");
+                getMessage[data.type](data.playerId, data.value);
+                console.log("END :::::::::::")
+            });
+
+            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : playerId , "value" : "이름"}))
         },(error)=>{console.log(error)});
     }
 
 
     function gameStart(){
-        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "playerId" : "player1"}));
+        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "playerId" : playerId}));
+    }
+
+    function toggleReadyState(id, data){
+        playerManager.setPlayerReady(id, data);
     }
 
     function gameReady(){
-        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : "player1" , "value" : "true"}));
+        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "true"}));
         rBtn.classList.add("d-none");
         rcBtn.classList.remove("d-none");
     }
 
-    function readyCancle(){
-        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : "player1" , "value" : "false"}));
+    function readyCancel(){
+        stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "false"}));
         rBtn.classList.remove("d-none");
         rcBtn.classList.add("d-none");
     }

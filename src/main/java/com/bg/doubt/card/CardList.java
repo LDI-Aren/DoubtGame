@@ -9,6 +9,9 @@ public class CardList {
     private List<String> cards;
 
     public int getSize(){
+        if(cards == null)
+            return 0;
+
         return cards.size();
     }
 
