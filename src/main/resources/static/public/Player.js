@@ -11,17 +11,26 @@ class Player{
         this.cards = 0;
         this.ready = false;
     }
-}
 
-class MyPlayer extends Player{
-    constructor(id, name) {
-        super(id, name, document.querySelector(".Hands"));
+    setReady(ready){
+        this.ready = ready;
+        if(ready){
+            console.log("r")
+            this.DOM.classList.add("Ready");
+        } else {
+            console.log("c")
+            this.DOM.classList.remove("Ready");
+        }
     }
 }
 
-class OtherPlayer extends Player{
-    constructor(id, name, DOM) {
-        super(id, name, DOM);
+class MyPlayer extends Player{
+    /**
+     * @param id : String  플레이어의 아이디
+     * @param name : String 플레이어 이름
+     * */
+    constructor(id, name) {
+        super(id, name, document.getElementById("Status"));
     }
 }
 
@@ -35,13 +44,21 @@ class PlayerManager{
     /**
      * @param id : String  플레이어의 아이디
      * @param name : String 플레이어 이름
+     * @param data : String room안에 있던 player들의 정보
      * */
-    joinPlayer(id, name) {
-        this.players[id] = new Player(id, name, this.playerDOM.querySelector(`#Empty`));
+    joinPlayer(id, name, data) {
 
         if(id === this.myId){
+            let playerData = JSON.parse(data);
+            this.players[id] = new MyPlayer(id, name);
+            for(let player in playerData){
+                this.joinPlayer(playerData[player].playerId, playerData[player].playerName, "{}");
+            }
             return;
         }
+        let joinPlayerDom = this.playerDOM.querySelector(`.Empty`);
+
+        this.players[id] = new Player(id, name, joinPlayerDom);
 
         if(joinPlayerDom === null){
             return;
@@ -52,6 +69,10 @@ class PlayerManager{
     }
 
     isAllReady(){
+        if(Object.keys(this.players).length !== 4){
+            return false;
+        }
+
         let isReady = true;
 
         for(let k in this.players){
@@ -66,12 +87,8 @@ class PlayerManager{
      * @param ready : boolean ready여부
      */
     setPlayerReady(id, ready){
-        this.players[id].ready = ready;
-
-        if(ready) {
-            joinPlayerDom.classList.add("Ready");
-        } else {
-            joinPlayerDom.classList.remove("Ready");
-        }
+        console.log("in manager = " + id + " : " + ready);
+        this.players[id].setReady(ready);
+        console.log("after Setting")
     }
 }

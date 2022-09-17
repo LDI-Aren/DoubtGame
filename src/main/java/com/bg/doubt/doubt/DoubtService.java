@@ -1,6 +1,7 @@
 package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
+import com.bg.doubt.Player.PlayerProfile;
 import com.bg.doubt.card.CardList;
 import com.bg.doubt.controller.RoomElement;
 import com.bg.doubt.gameMessage.GameMessage;
@@ -68,7 +69,7 @@ public class DoubtService {
         return gameRoom.getRoomStatusByPlayerId(msg.getPlayerId());
     }
 
-    public RoomStatus joinPlayer(GameMessage msg, String roomId) throws Exception {
+    public List<PlayerProfile> joinPlayer(GameMessage msg, String roomId) throws Exception {
         if(!gameRooms.containsKey(roomId)){
             throw new Exception("게임방이 존재하지 않습니다.");
         }
@@ -77,9 +78,10 @@ public class DoubtService {
             throw new Exception("방에 인원이 가득 찼습니다.");
         }
 
-        RoomStatus rs = gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getPlayerId()));
+        List<PlayerProfile> profiles = gameRooms.get(roomId).getPlayersProfile();
+        gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getPlayerId()));
 
-        return rs;
+        return profiles;
     }
 
     public RoomStatus sendCard(GameMessage msg, String roomId) throws Exception {
@@ -111,14 +113,14 @@ public class DoubtService {
         return game.getStatus();
     }
 
-    public String gameReady(GameMessage msg, String roomId) throws Exception {
+    public boolean gameReady(GameMessage msg, String roomId) throws Exception {
         if(!gameRooms.containsKey(roomId)){
             throw new Exception("게임방이 존재하지 않습니다.");
         }
 
         boolean isReady = gameRooms.get(roomId).gameReady(msg.getPlayerId(), msg.getValue());
 
-        return String.valueOf(isReady);
+        return isReady;
     }
 
     public boolean isDuplicate(String roomId, String playerId) {
@@ -127,5 +129,10 @@ public class DoubtService {
         }
 
         return gameRooms.get(roomId).isDuplicate(playerId);
+    }
+
+    public List<String> getDestinationPlayerId(String roomId, String playerId) {
+
+        return gameRooms.get(roomId).getDestinationPlayerId(playerId);
     }
 }

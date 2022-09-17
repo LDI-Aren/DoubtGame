@@ -59,12 +59,16 @@
             getHands(JSON.parse(data));
         },
         "JOIN" : (id, data) => {
+            console.log(data);
             console.log(id + " 님이 입장했습니다.");
-            playerManager.joinPlayer(id, "name");
+            playerManager.joinPlayer(id, id, data);
         },
         "READY" : (id, data) => {
-            console.log(id + JSON.parse(data)?" : Ready":" : Cancel");
-            toggleReadyState(id, data);
+            console.log(id + (JSON.parse(data)?" : Ready":" : Cancel"));
+            toggleReadyState(id, JSON.parse(data));
+            if(playerManager.isAllReady()){
+                stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "START" , "playerId" : playerId}))
+            }
         },
         "ERROR" : (id, data) => {
             console.log(data);
@@ -96,7 +100,7 @@
                 let data = JSON.parse(msg.body);
                 console.log(data);
                 console.log(data.type + "::::::::");
-                getMessage[data.type](data.value);
+                getMessage[data.type](data.playerId, data.value);
                 console.log("END :::::::::::")
             });
 
@@ -108,7 +112,7 @@
                 console.log("END :::::::::::")
             });
 
-            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : playerId , "value" : "이름"}))
+            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : playerId, "value" : playerId}))
         },(error)=>{console.log(error)});
     }
 
@@ -118,6 +122,7 @@
     }
 
     function toggleReadyState(id, data){
+        console.log(id + " : " + data);
         playerManager.setPlayerReady(id, data);
     }
 

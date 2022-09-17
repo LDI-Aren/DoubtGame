@@ -2,6 +2,7 @@ package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
 import com.bg.doubt.Player.PlayerAndCard;
+import com.bg.doubt.Player.PlayerProfile;
 import com.bg.doubt.card.CardList;
 import com.bg.doubt.card.CardSetter;
 import com.bg.doubt.gameMessage.GameStatus;
@@ -9,6 +10,7 @@ import com.bg.doubt.gameMessage.RoomStatus;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Doubt {
     private String roomName;
@@ -62,14 +64,12 @@ public class Doubt {
                 .build();
     }
 
-    public RoomStatus join(Player player) throws Exception {
+    public void join(Player player) throws Exception {
         if(players.size() >= 4){
             throw new Exception("Player already full");
         }
 
         players.add(player);
-
-        return getRoomState(player.getId());
     }
 
     public RoomStatus sendCard(String playerId ,CardList inputCards) throws Exception {
@@ -163,5 +163,18 @@ public class Doubt {
 
     public boolean isDuplicate(String playerId) {
         return !findPlayerById(playerId).equals(Player.EmptyPlayer);
+    }
+
+    public List<PlayerProfile> getPlayersProfile() {
+        return players.stream()
+                .map(PlayerProfile::getProfile)
+                .collect(Collectors.toList());
+    }
+
+    public List<String> getDestinationPlayerId(String playerId) {
+        return players.stream()
+                .map(Player::getId)
+                .filter(id -> !id.equals(playerId))
+                .collect(Collectors.toList());
     }
 }

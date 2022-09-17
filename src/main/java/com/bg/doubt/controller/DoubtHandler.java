@@ -11,6 +11,8 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
+import java.util.List;
+
 
 @Controller
 @Slf4j
@@ -44,10 +46,24 @@ public class DoubtHandler {
         return returnMessage;
     }
 
+    public void sendToPlayer(String player, GameMessage msg){
+        messagingTemplate.convertAndSend(String.format("/topic/player/%s",player), msg);
+    }
+
+    public void sendToPlayer(List<String> players, GameMessage msg){
+        players.forEach(
+                p -> messagingTemplate.convertAndSend(String.format("/topic/player/%s",p), msg)
+        );
+    }
+
     @MessageMapping("/join/{roomId}")
-    @SendTo("/topic/game-room/{roomId}")
-    public GameMessage joinRoom(GameMessage msg, @DestinationVariable("roomId") String roomId){
-        return messageWrapper(msg, roomId, (gm, s) -> doubtService.joinPlayer(gm, s));
+    public void joinRoom(GameMessage msg, @DestinationVariable("roomId") String roomId){
+        String playerId = msg.getPlayerId();
+
+        sendToPlayer(doubtService.getDestinationPlayerId(roomId, playerId), msg);
+
+        GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.joinPlayer(gm, s));
+        sendToPlayer(msg.getPlayerId(), gameMessage);
     }
 
     @MessageMapping("/play/{roomId}")
