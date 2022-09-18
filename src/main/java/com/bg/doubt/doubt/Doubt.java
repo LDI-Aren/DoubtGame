@@ -9,7 +9,6 @@ import com.bg.doubt.gameMessage.GameStatus;
 import com.bg.doubt.gameMessage.RoomStatus;
 
 import java.util.*;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Doubt {
@@ -40,6 +39,7 @@ public class Doubt {
 
     private Player findPlayerById(String playerId){
         for (Player player : players) {
+            System.out.println(playerId + " : " + player.getId());
             if(player.getId().equals(playerId)){
                 return player;
             }
@@ -74,7 +74,7 @@ public class Doubt {
 
     public RoomStatus sendCard(String playerId ,CardList inputCards) throws Exception {
         Player player =  findPlayerById(playerId);
-        if(player == null){
+        if(player.equals(Player.EmptyPlayer)){
             throw new Exception("Player Not Found");
         }
 

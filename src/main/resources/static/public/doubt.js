@@ -130,8 +130,10 @@ function clickCard() {
     }
 }
 
+/**
+ * @param list card의 이름이 담긴 배열
+ */
 function getHands(list){
-    //list는 패로 받은 카드이름(CARD의 원소)이 담긴 배열
     console.log(list)
 
     list.map(e => {
@@ -143,11 +145,11 @@ function getHands(list){
 function sendCard(){
     let cardNames = hands.removeClickedHands();
 
-    stompClient.send(`/message/send/${params.roomId}`,{}, JSON.stringify({"type" : "SEND" , "userId" : "player1", "value" : JSON.stringify(cardNames)}));
+    stompClient.send(`/message/send/${params.roomId}`,{}, JSON.stringify({"type" : "SEND" , "playerId" : playerId, "value" : JSON.stringify(cardNames)}));
 
     console.log(JSON.stringify(cardNames));
 }
 
 function doubt(){
-    stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "userId" : "player1"}));
+    stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "playerId" : playerId}));
 }

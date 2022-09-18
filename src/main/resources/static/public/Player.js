@@ -52,18 +52,23 @@ class PlayerManager{
             let playerData = JSON.parse(data);
             this.players[id] = new MyPlayer(id, name);
             for(let player in playerData){
-                this.joinPlayer(playerData[player].playerId, playerData[player].playerName, "{}");
+                this.joinPlayer(
+                    playerData[player].playerId,
+                    playerData[player].playerName,
+                    `{"ready":"${playerData[player].isReady}"}`
+                );
             }
             return;
         }
+
         let joinPlayerDom = this.playerDOM.querySelector(`.Empty`);
-
-        this.players[id] = new Player(id, name, joinPlayerDom);
-
         if(joinPlayerDom === null){
             return;
         }
 
+        this.players[id] = new Player(id, name, joinPlayerDom);
+
+        this.setPlayerReady(id, JSON.parse(data).ready);
         joinPlayerDom.classList.remove("Empty");
         joinPlayerDom.innerHTML = name;
     }

@@ -29,10 +29,10 @@
         </div>
 
         <div id="Status" class="BtnField">
-            <button id="sBtn" class="blueBtn playBtn d-none" onclick="sendCard()">카드 내기</button>
-            <button id="dBtn" class="redBtn playBtn d-none" onclick="doubt()">다우트</button>
-            <button id="rBtn" class="blueBtn playBtn" onclick="gameReady()">준비</button>
-            <button id="rcBtn" class="grayBtn playBtn d-none" onclick="readyCancel()">준비완료</button>
+            <button id="sBtn" class="gameBtn blueBtn playBtn d-none" disabled onclick="sendCard()">카드 내기</button>
+            <button id="dBtn" class="gameBtn redBtn playBtn d-none" disabled onclick="doubt()">다우트</button>
+            <button id="rBtn" class="readyBtn blueBtn playBtn" onclick="gameReady()">준비</button>
+            <button id="rcBtn" class="readyBtn grayBtn playBtn d-none" onclick="readyCancel()">준비완료</button>
         </div>
 
         <div id="Hands" class="Hands">
@@ -56,7 +56,9 @@
 
     let getMessage = {
         "START" : (id, data) => {
-            getHands(JSON.parse(data));
+            let playerAndCards = JSON.parse(data);
+            getHands(playerAndCards.myCards);
+            changeToStartButton();
         },
         "JOIN" : (id, data) => {
             console.log(data);
@@ -67,7 +69,7 @@
             console.log(id + (JSON.parse(data)?" : Ready":" : Cancel"));
             toggleReadyState(id, JSON.parse(data));
             if(playerManager.isAllReady()){
-                stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "START" , "playerId" : playerId}))
+                gameStart();
             }
         },
         "ERROR" : (id, data) => {
@@ -118,7 +120,7 @@
 
 
     function gameStart(){
-        stompClient.send(`/message/start/${params.roomId}`,{}, JSON.stringify({"type" : "START" , "playerId" : playerId}));
+        stompClient.send(`/message/start/${params.roomId}`, {} ,JSON.stringify({"type" : "START" , "playerId" : playerId}))
     }
 
     function toggleReadyState(id, data){
@@ -136,6 +138,23 @@
         stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "false"}));
         rBtn.classList.remove("d-none");
         rcBtn.classList.add("d-none");
+    }
+
+    function changeToStartButton(){
+        Status.querySelectorAll(".readyBtn")
+            .forEach(b => {
+                b.setAttribute("disabled" , "disabled");
+                b.classList.add("d-none");
+            })
+
+        Status.querySelectorAll(".gameBtn")
+            .forEach(b => {
+                b.removeAttribute("disabled");
+
+                if(b.id === "sBtn"){
+                    b.classList.remove("d-none");
+                }
+            })
     }
 
 </script>

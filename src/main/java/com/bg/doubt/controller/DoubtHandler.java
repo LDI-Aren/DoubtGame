@@ -60,18 +60,12 @@ public class DoubtHandler {
     public void joinRoom(GameMessage msg, @DestinationVariable("roomId") String roomId){
         String playerId = msg.getPlayerId();
 
-        sendToPlayer(doubtService.getDestinationPlayerId(roomId, playerId), msg);
-
         GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.joinPlayer(gm, s));
+        if(!gameMessage.getType().equals(MessageType.ERROR)){
+            sendToPlayer(doubtService.getDestinationPlayerId(roomId, playerId), msg);
+        }
+
         sendToPlayer(msg.getPlayerId(), gameMessage);
-    }
-
-    @MessageMapping("/play/{roomId}")
-    @SendTo("/topic/game-room/{roomId}")
-    public GameMessage playCard(GameMessage msg , @DestinationVariable("roomId") String roomId){
-
-        log.info(" roomId : " + roomId);
-        return msg;
     }
 
     @MessageMapping("/ready/{roomId}")
@@ -82,9 +76,9 @@ public class DoubtHandler {
     }
 
     @MessageMapping("/start/{roomId}")
-    @SendTo("/topic/game-room/{roomId}")
-    public GameMessage startGame(GameMessage msg, @DestinationVariable("roomId") String roomId){
-        return messageWrapper(msg, roomId,(gm, s) -> doubtService.startGame(gm, s));
+    public void startGame(GameMessage msg, @DestinationVariable("roomId") String roomId){
+        GameMessage gameMessage = messageWrapper(msg, roomId,(gm, s) -> doubtService.startGame(gm, s));
+        sendToPlayer(msg.getPlayerId(), gameMessage);
     }
 
     @MessageMapping("/send/{roomId}")

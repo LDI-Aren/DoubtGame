@@ -37,6 +37,20 @@ public class DoubtService {
 
         gameRooms.put(id, doubt);
 
+        //test 용 input-------------------------------------------------------------
+        try {
+            joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("q").value("q").build(), id);
+            joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("w").value("w").build(), id);
+            joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("e").value("e").build(), id);
+
+            gameReady(GameMessage.builder().type(MessageType.READY).playerId("q").value("true").build(), id);
+            gameReady(GameMessage.builder().type(MessageType.READY).playerId("w").value("true").build(), id);
+            gameReady(GameMessage.builder().type(MessageType.READY).playerId("e").value("true").build(), id);
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        //---------------------------------------------------------------------------
+
         return id;
     }
 
@@ -52,8 +66,6 @@ public class DoubtService {
     }
 
     public RoomStatus startGame(GameMessage msg, String roomId) throws Exception {
-
-        /*
         if(!gameRooms.containsKey(roomId)){
             throw new Exception("게임방이 존재하지 않습니다.");
         }
@@ -61,7 +73,6 @@ public class DoubtService {
         if(gameRooms.get(roomId).numberOfPlayer() < 4){
             throw new Exception("게임방을 시작하기 위한 인원이 부족합니다.");
         }
-        */
 
         Doubt gameRoom = gameRooms.get(roomId);
         gameRoom.gameStart();
@@ -94,6 +105,9 @@ public class DoubtService {
 
         Player nextPlayer = null;
 
+        System.out.println("In SendCard : ");
+        System.out.println(msg.getPlayerId());
+        System.out.println(cards);
         RoomStatus rs = gameRooms.get(roomId).sendCard(msg.getPlayerId(),cards);
 
         return rs;
