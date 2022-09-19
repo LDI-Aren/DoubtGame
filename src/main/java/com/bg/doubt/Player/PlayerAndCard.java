@@ -7,5 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class PlayerAndCard {
     private String playerId;
-    private int cardNum;
+    private int numOfCards;
 }

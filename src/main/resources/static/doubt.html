@@ -15,9 +15,18 @@
     <div class="Field">
 
         <div id="Players" class="Players">
-            <div class="Player Empty">Player1</div>
-            <div class="Player Empty">Player2</div>
-            <div class="Player Empty">Player3</div>
+            <div class="Player Empty">
+                <div class="player-name">Player1</div>
+                <div class="player-status" data-status>비어있음</div>
+            </div>
+            <div class="Player Empty">
+                <div class="player-name">Player2</div>
+                <div class="player-status" data-status>비어있음</div>
+            </div>
+            <div class="Player Empty">
+                <div class="player-name">Player3</div>
+                <div class="player-status" data-status>비어있음</div>
+            </div>
         </div>
 
         <div class="GameField">
@@ -29,10 +38,12 @@
         </div>
 
         <div id="Status" class="BtnField">
+            <div id="my-name" class="my-field">이름</div>
             <button id="sBtn" class="gameBtn blueBtn playBtn d-none" disabled onclick="sendCard()">카드 내기</button>
             <button id="dBtn" class="gameBtn redBtn playBtn d-none" disabled onclick="doubt()">다우트</button>
             <button id="rBtn" class="readyBtn blueBtn playBtn" onclick="gameReady()">준비</button>
             <button id="rcBtn" class="readyBtn grayBtn playBtn d-none" onclick="readyCancel()">준비완료</button>
+            <div id="my-status" class="my-field" data-status>준비해주세요</div>
         </div>
 
         <div id="Hands" class="Hands">
@@ -56,9 +67,10 @@
 
     let getMessage = {
         "START" : (id, data) => {
-            let playerAndCards = JSON.parse(data);
-            getHands(playerAndCards.myCards);
+            let roomStatus = JSON.parse(data);
+            getHands(roomStatus.myCards);
             changeToStartButton();
+            playerManager.setGameStatus(roomStatus.playerAndCards);
         },
         "JOIN" : (id, data) => {
             console.log(data);
@@ -86,8 +98,8 @@
 
     window.onload = () => {
 
-        if(playerId === undefined){
-            location.href = "/";
+        if(playerId === null){
+            //location.href = "/";
         }
 
         console.log("playerId : " + playerId);

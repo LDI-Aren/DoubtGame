@@ -14,13 +14,18 @@ class Player{
 
     setReady(ready){
         this.ready = ready;
+        let playerStatus = this.DOM.querySelector("[data-status]");
         if(ready){
             console.log("r")
-            this.DOM.classList.add("Ready");
+            playerStatus.innerHTML = "READY!";
         } else {
             console.log("c")
-            this.DOM.classList.remove("Ready");
+            playerStatus.innerHTML = "준비해주세요.";
         }
+    }
+
+    setStatus(numOfCards){
+        this.DOM.querySelector("[data-status]").innerHTML = `cards : ${numOfCards}`;
     }
 }
 
@@ -32,6 +37,19 @@ class MyPlayer extends Player{
     constructor(id, name) {
         super(id, name, document.getElementById("Status"));
     }
+
+    // setReady(ready){
+    //     this.ready = ready;
+    //     if(ready){
+    //         this.DOM.querySelector("[data-status]").innerHTML = "READY!";
+    //     } else {
+    //         this.DOM.querySelector("#my-status").innerHTML = "준비해주세요.";
+    //     }
+    // }
+    //
+    // setStatus(numOfCards){
+    //     this.DOM.querySelector("#my-status").innerHTML = `cards : ${numOfCards}`;
+    // }
 }
 
 class PlayerManager{
@@ -70,7 +88,7 @@ class PlayerManager{
 
         this.setPlayerReady(id, JSON.parse(data).ready);
         joinPlayerDom.classList.remove("Empty");
-        joinPlayerDom.innerHTML = name;
+        joinPlayerDom.querySelector(".player-name").innerHTML = name;
     }
 
     isAllReady(){
@@ -80,8 +98,8 @@ class PlayerManager{
 
         let isReady = true;
 
-        for(let k in this.players){
-            isReady = isReady && this.players[k].ready;
+        for(let n in this.players){
+            isReady = isReady && this.players[n].ready;
         }
 
         return isReady;
@@ -95,5 +113,14 @@ class PlayerManager{
         console.log("in manager = " + id + " : " + ready);
         this.players[id].setReady(ready);
         console.log("after Setting")
+    }
+
+    /**
+     * @param data : Object [{playerId , numOfCards},...]
+     */
+    setGameStatus(data) {
+        for(let n in data){
+            this.players[data[n].playerId].setStatus(data[n].numOfCards);
+        }
     }
 }

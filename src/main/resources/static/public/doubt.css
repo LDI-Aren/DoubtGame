@@ -37,7 +37,7 @@ body{
 
 .Field{
   height: calc(95vh);
-  background-color: #373737;
+  background-color: #777;
 }
 
 .Players{
@@ -45,52 +45,69 @@ body{
   justify-content: space-around;
   height: 10%;
   color : wheat;
+  background-color: dimgray;
+}
+
+.Player{
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.player-name{
+  height: 34%;
+}
+
+.player-status{
+  padding-block-start: 13%;
+  height: 53%;
 }
 
 .Empty{
   color : black;
 }
 
-.Ready{
-  background-color: gray;
-}
-
 .GameField{
   height:60%;
 }
 
-.blueBtn{
+.playBtn{
   border: 0;
   height: 100%;
-  width: 30%;
+  width: 33%;
+}
+
+.playBtn:hover {
+  filter: brightness(0.85);
+}
+
+.blueBtn{
   background-color: aquamarine;
 }
 
 .redBtn{
-  border: 0;
-  height: 100%;
-  width: 30%;
   background-color: firebrick;
 }
 
 .grayBtn{
-  border: 0;
-  height: 100%;
-  width: 30%;
   background-color: gray;
 }
 
 .blueBtn{
-  border: 0;
-  height: 100%;
-  width: 30%;
   background-color: aquamarine;
 }
 
 .BtnField{
   display: flex;
-  justify-content: center;
+  justify-content: space-around;
   height: 7.5%;
+}
+
+.my-field{
+  font-size: 1.5rem;
+  width: 33%;
+  text-align: center;
+  padding: 1rem 0;
+  color: wheat;
 }
 
 .Gauge{
@@ -99,8 +116,4 @@ body{
 
 .d-none{
   display: none;
-}
-
-.playBtn:hover {
-  opacity: 0.7;
 }
