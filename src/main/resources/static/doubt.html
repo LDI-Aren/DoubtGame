@@ -10,6 +10,7 @@
 </head>
 <script src="/public/doubt.js"></script>
 <script src="/public/Player.js"></script>
+<script src="/public/field.js"></script>
 
 <body>
     <div class="Field">
@@ -29,8 +30,12 @@
             </div>
         </div>
 
-        <div class="GameField">
-
+        <div id="GameField" class="GameField">
+            <div id ="notification">
+                <span id="card-notification"></span>
+                <span id="turn"></span>
+            </div>
+            <span id="field-card-num">필드의 카드 : <span id="num-of-cards" class="important-text">0</span>장</span>
         </div>
 
         <div class="Gauge">
@@ -64,6 +69,7 @@
     let stompClient;
     let playerId = params.playerId;
     let playerManager = new PlayerManager(document.getElementById("Players"), playerId);
+    let field = new Field(document.getElementById("GameField"));
 
     let getMessage = {
         "START" : (id, data) => {
@@ -71,6 +77,7 @@
             getHands(roomStatus.myCards);
             changeToStartButton();
             playerManager.setGameStatus(roomStatus.playerAndCards);
+            field.whenSTART(roomStatus.turnPlayer);
         },
         "JOIN" : (id, data) => {
             console.log(data);
@@ -88,7 +95,10 @@
             console.log(data);
         },
         "SEND" : (id, data) => {
-            console.log(data);
+            let sendCardData = JSON.parse(data);
+            console.log(sendCardData);
+            field.whenSEND(sendCardData);
+            playerManager.sendCardCount(sendCardData);
         },
         "DOUBT" : (id, data) => {
             console.log(data);
@@ -103,6 +113,7 @@
         }
 
         console.log("playerId : " + playerId);
+        document.getElementById("my-name").innerHTML = playerId;
 
         CardInit();
 

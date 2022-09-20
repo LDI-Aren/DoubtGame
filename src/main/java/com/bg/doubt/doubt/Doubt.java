@@ -62,6 +62,7 @@ public class Doubt {
                 .playerAndCards(players.stream()
                         .map(Player::getInfo)
                         .toArray(PlayerAndCard[]::new))
+                .turnPlayer(getTurnId())
                 .FieldNum(topCards)
                 .myCards(findPlayerById(playerId).getCards())
                 .build();
@@ -75,7 +76,7 @@ public class Doubt {
         players.add(player);
     }
 
-    public RoomStatus sendCard(String playerId ,CardList inputCards) throws Exception {
+    public SendCardData sendCard(String playerId ,CardList inputCards) throws Exception {
         Player player =  findPlayerById(playerId);
         if(player.equals(Player.EmptyPlayer)){
             throw new Exception("Player Not Found");
@@ -94,7 +95,17 @@ public class Doubt {
 
         turn++;
 
-        return getRoomState(playerId);
+        return SendCardData.builder()
+                .playerId(playerId)
+                .cardNum(ordered[(turn-1)%13])
+                .numOfCards(inputCards.getSize())
+                .nextCard(ordered[turn%13])
+                .nextPlayer(getTurnId())
+                .build();
+    }
+
+    private String getTurnId() {
+        return players.get(turn%4).getId();
     }
 
     private boolean isMatch(List<String> last){

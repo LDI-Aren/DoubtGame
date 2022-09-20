@@ -23,7 +23,20 @@ class Player{
     }
 
     setStatus(numOfCards){
-        this.DOM.querySelector("[data-status]").innerHTML = `cards : ${numOfCards}`;
+        this.cards = numOfCards;
+        this.showCardStatus();
+    }
+
+    showCardStatus(){
+        this.DOM.querySelector("[data-status]").innerHTML = `cards : ${this.cards}`;
+    }
+
+    /**
+     * @param numOfCards : Number 차례인 player가 낸 카드의 수
+     */
+    cardCount(numOfCards){
+        this.cards += numOfCards;
+        this.showCardStatus();
     }
 }
 
@@ -108,5 +121,14 @@ class PlayerManager{
         for(let n in data){
             this.players[data[n].playerId].setStatus(data[n].numOfCards);
         }
+    }
+
+    /**
+     * @param data : Object {playerId, numOfCards}
+     */
+    sendCardCount(data){
+        console.log(data.playerId);
+        console.log(this.players[data.playerId]);
+        this.players[data.playerId].cardCount(-data.numOfCards);
     }
 }

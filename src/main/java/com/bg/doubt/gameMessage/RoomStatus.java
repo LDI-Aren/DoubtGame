@@ -11,6 +11,7 @@ import java.util.List;
 public class RoomStatus {
     PlayerAndCard[] playerAndCards;
     int FieldNum;
+    String turnPlayer;
 
     List<String> myCards;
 }

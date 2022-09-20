@@ -1,6 +1,7 @@
 package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
+import com.bg.doubt.Player.PlayerAndCard;
 import com.bg.doubt.Player.PlayerProfile;
 import com.bg.doubt.card.CardList;
 import com.bg.doubt.controller.RoomElement;
@@ -98,7 +99,7 @@ public class DoubtService {
         return profiles;
     }
 
-    public RoomStatus sendCard(GameMessage msg, String roomId) throws Exception {
+    public SendCardData sendCard(GameMessage msg, String roomId) throws Exception {
         CardList cards = new CardList();
         cards.setCards(gson.fromJson(msg.getValue(),LinkedList.class));
 
@@ -111,7 +112,7 @@ public class DoubtService {
         System.out.println("In SendCard : ");
         System.out.println(msg.getPlayerId());
         System.out.println(cards);
-        RoomStatus rs = gameRooms.get(roomId).sendCard(msg.getPlayerId(),cards);
+        SendCardData rs = gameRooms.get(roomId).sendCard(msg.getPlayerId(),cards);
 
         return rs;
     }

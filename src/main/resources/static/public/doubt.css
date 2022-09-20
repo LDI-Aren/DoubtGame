@@ -68,6 +68,26 @@ body{
 
 .GameField{
   height:60%;
+  color : wheat;
+  text-align: center;
+  font-size: xx-large;
+  display: flex;
+  flex-direction: column;
+}
+
+.GameField>#notification{
+  margin-top: 5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+#field-card-num{
+  margin-top: 4.5rem;
+}
+
+.important-text{
+  color: yellow;
+  font-weight: bold;
 }
 
 .playBtn{
@@ -116,4 +136,8 @@ body{
 
 .d-none{
   display: none;
+}
+
+hr{
+  color : wheat;
 }
