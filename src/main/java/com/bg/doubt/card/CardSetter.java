@@ -1,9 +1,10 @@
 package com.bg.doubt.card;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CardSetter {
-    private static String[] CARDS = {
+    private static final String[] CARDS = {
             "clover_A",
             "clover_2",
             "clover_3",
@@ -58,11 +59,11 @@ public class CardSetter {
             "diamond_K"
     };
 
-    public static ArrayList<String> getCards(int num){
+    public static ArrayList<String> getCards(List<Integer> order){
         ArrayList<String> cards = new ArrayList<>();
 
-        for (int i = 0; i < num; i++) {
-            cards.add(CARDS[(i*5)%52]);
+        for (int i = 0; i < 13; i++) {
+            cards.add(CARDS[order.get(i)]);
         }
 
         return cards;

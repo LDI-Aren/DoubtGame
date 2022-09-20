@@ -3,7 +3,6 @@ package com.bg.doubt.card;
 import lombok.Data;
 import lombok.ToString;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,6 +13,10 @@ public class CardList {
 
     public CardList(){
         cards = new LinkedList<>();
+    }
+    public CardList(List<String> list){
+        cards = new LinkedList<>();
+        cards.addAll(list);
     }
 
     public int getSize(){

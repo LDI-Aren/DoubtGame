@@ -9,7 +9,6 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class Player {
-    private String name;
     private String id;
     private CardList cards;
     private boolean ready;
@@ -17,9 +16,8 @@ public class Player {
     public static Player EmptyPlayer = new Player();
 
 
-    public Player(String name, String id) {
+    public Player(String id) {
         this.cards = new CardList();
-        this.name = name;
         this.id = id;
         ready = false;
     }

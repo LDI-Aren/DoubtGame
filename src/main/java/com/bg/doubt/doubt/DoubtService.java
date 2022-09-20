@@ -41,11 +41,9 @@ public class DoubtService {
         try {
             joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("q").value("q").build(), id);
             joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("w").value("w").build(), id);
-            joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("e").value("e").build(), id);
 
             gameReady(GameMessage.builder().type(MessageType.READY).playerId("q").value("true").build(), id);
             gameReady(GameMessage.builder().type(MessageType.READY).playerId("w").value("true").build(), id);
-            gameReady(GameMessage.builder().type(MessageType.READY).playerId("e").value("true").build(), id);
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -75,7 +73,12 @@ public class DoubtService {
         }
 
         Doubt gameRoom = gameRooms.get(roomId);
-        gameRoom.gameStart();
+
+        synchronized (gameRoom) {
+            if (!gameRoom.isInit()) {
+                gameRoom.gameStart();
+            }
+        }
 
         return gameRoom.getRoomStatusByPlayerId(msg.getPlayerId());
     }
@@ -90,7 +93,7 @@ public class DoubtService {
         }
 
         List<PlayerProfile> profiles = gameRooms.get(roomId).getPlayersProfile();
-        gameRooms.get(roomId).join(new Player(msg.getValue(), msg.getPlayerId()));
+        gameRooms.get(roomId).join(new Player(msg.getPlayerId()));
 
         return profiles;
     }

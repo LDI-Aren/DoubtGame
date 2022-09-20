@@ -10,12 +10,14 @@ import com.bg.doubt.gameMessage.RoomStatus;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Doubt {
     private String roomName;
     private final ArrayList<Player> players;
     private final LinkedList<CardList> field;
     private int turn;
+    private boolean isInit;
 
     private static final String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
@@ -23,6 +25,7 @@ public class Doubt {
         this.players = new ArrayList<>();
         this.field = new LinkedList<>();
         turn = 0;
+        isInit = false;
     }
 
     public String getRoomName() {
@@ -142,12 +145,29 @@ public class Doubt {
             throw new Exception("Not All Ready");
         }
 
-        players.forEach((k) -> {
-            CardList cl = new CardList();
-            cl.setCards(CardSetter.getCards(13));
+        List<Integer> initialOrder = setInitialOrder();
 
-            k.gainCard(List.of(cl));
-        });
+        for(int i = 0 ; i < players.size() ; ++i){
+            List<Integer> sub = initialOrder.subList(i*13, (i*13 + 13));
+            System.out.println(sub);
+
+            CardList cl = new CardList(
+                    CardSetter.getCards(
+                            sub
+                    )
+            );
+
+            players.get(i).gainCard(List.of(cl));
+        }
+
+        isInit = true;
+    }
+
+    private List<Integer> setInitialOrder() {
+        List<Integer> arr = IntStream.range(0,52).boxed().collect(Collectors.toList());
+        Collections.shuffle(arr);
+
+        return arr;
     }
 
     public boolean gameReady(String playerId, String value) {
@@ -176,5 +196,9 @@ public class Doubt {
                 .map(Player::getId)
                 .filter(id -> !id.equals(playerId))
                 .collect(Collectors.toList());
+    }
+
+    public boolean isInit() {
+        return isInit;
     }
 }

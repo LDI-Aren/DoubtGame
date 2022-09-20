@@ -1,12 +1,10 @@
 class Player{
     /**
      * @param id : String  플레이어의 아이디
-     * @param name : String 플레이어 이름
      * @param DOM : HTMLElement
      * */
-    constructor(id, name, DOM) {
+    constructor(id,  DOM) {
         this.id = id;
-        this.name = name;
         this.DOM = DOM;
         this.cards = 0;
         this.ready = false;
@@ -20,7 +18,7 @@ class Player{
             playerStatus.innerHTML = "READY!";
         } else {
             console.log("c")
-            playerStatus.innerHTML = "준비해주세요.";
+            playerStatus.innerHTML = "준비해주세요";
         }
     }
 
@@ -32,24 +30,10 @@ class Player{
 class MyPlayer extends Player{
     /**
      * @param id : String  플레이어의 아이디
-     * @param name : String 플레이어 이름
      * */
-    constructor(id, name) {
-        super(id, name, document.getElementById("Status"));
+    constructor(id) {
+        super(id, document.getElementById("Status"));
     }
-
-    // setReady(ready){
-    //     this.ready = ready;
-    //     if(ready){
-    //         this.DOM.querySelector("[data-status]").innerHTML = "READY!";
-    //     } else {
-    //         this.DOM.querySelector("#my-status").innerHTML = "준비해주세요.";
-    //     }
-    // }
-    //
-    // setStatus(numOfCards){
-    //     this.DOM.querySelector("#my-status").innerHTML = `cards : ${numOfCards}`;
-    // }
 }
 
 class PlayerManager{
@@ -61,34 +45,36 @@ class PlayerManager{
 
     /**
      * @param id : String  플레이어의 아이디
-     * @param name : String 플레이어 이름
      * @param data : String room안에 있던 player들의 정보
      * */
-    joinPlayer(id, name, data) {
+    joinPlayer(id, data) {
 
         if(id === this.myId){
-            let playerData = JSON.parse(data);
-            this.players[id] = new MyPlayer(id, name);
-            for(let player in playerData){
-                this.joinPlayer(
-                    playerData[player].playerId,
-                    playerData[player].playerName,
-                    `{"ready":"${playerData[player].isReady}"}`
-                );
-            }
+            this.setPlayerData(id, data);
             return;
         }
 
         let joinPlayerDom = this.playerDOM.querySelector(`.Empty`);
+
         if(joinPlayerDom === null){
             return;
         }
 
-        this.players[id] = new Player(id, name, joinPlayerDom);
+        this.players[id] = new Player(id, joinPlayerDom);
 
-        this.setPlayerReady(id, JSON.parse(data).ready);
         joinPlayerDom.classList.remove("Empty");
-        joinPlayerDom.querySelector(".player-name").innerHTML = name;
+        joinPlayerDom.querySelector(".player-name").innerHTML = id;
+        joinPlayerDom.querySelector(".player-status").innerHTML = "준비해주세요";
+
+    }
+
+    setPlayerData(id, data){
+        let playerData = JSON.parse(data);
+        this.players[id] = new MyPlayer(id);
+        for(let player in playerData){
+            this.joinPlayer(playerData[player].playerId, "");
+            this.setPlayerReady(playerData[player].playerId, playerData[player].isReady);
+        }
     }
 
     isAllReady(){

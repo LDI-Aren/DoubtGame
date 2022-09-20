@@ -75,7 +75,7 @@
         "JOIN" : (id, data) => {
             console.log(data);
             console.log(id + " 님이 입장했습니다.");
-            playerManager.joinPlayer(id, id, data);
+            playerManager.joinPlayer(id, data);
         },
         "READY" : (id, data) => {
             console.log(id + (JSON.parse(data)?" : Ready":" : Cancel"));
@@ -126,7 +126,7 @@
                 console.log("END :::::::::::")
             });
 
-            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : playerId, "value" : playerId}))
+            stompClient.send(`/message/join/${params.roomId}`, {} ,JSON.stringify({"type" : "JOIN" , "playerId" : playerId}))
         },(error)=>{console.log(error)});
     }
 

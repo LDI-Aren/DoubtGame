@@ -2,7 +2,6 @@ class Hands {
     constructor(HandsDOM, cards){
         this.HandsDOM = HandsDOM;
         this.cards = cards;
-        this.clicked = {};
     }
 
     pushHands(cardName){
@@ -34,6 +33,53 @@ class Hands {
         }
 
         return cardNames;
+    }
+
+    sortCards(){
+        let items = this.HandsDOM.querySelectorAll(".Hand");
+
+        [...items].sort(
+            (fir,sec) => {
+                let a = fir.getAttribute("data-code").split("_");
+                let b = sec.getAttribute("data-code").split("_");
+
+                let compareNum = this.numOrder(a[1]) - this.numOrder(b[1]);
+                let compareShape = this.shapeOrder(a[0]) - this.shapeOrder(b[0]);
+
+                return (compareNum === 0) ? compareShape : compareNum;
+            }
+        ).forEach(e => this.HandsDOM.appendChild(e));
+    }
+
+    shapeOrder(shape){
+        switch (shape){
+            case "spade" : return 1
+            case "diamond" : return 2
+            case "hart" : return 3
+            case "clover" : return 4
+        }
+
+        return 5;
+    }
+
+    numOrder(num){
+        switch (num){
+            case "A" : return 1
+            case "2" : return 2
+            case "3" : return 3
+            case "4" : return 4
+            case "5" : return 5
+            case "6" : return 6
+            case "7" : return 7
+            case "8" : return 8
+            case "9" : return 9
+            case "10" : return 10
+            case "J" : return 11
+            case "Q" : return 12
+            case "K" : return 13
+        }
+
+        return 14;
     }
 }
 
@@ -116,6 +162,7 @@ function getImage(name) {
     div.classList.add("Hand");
     div.onclick = clickCard;
     div.innerHTML = image;
+    div.setAttribute("data-code", name);
 
     document.getElementById("imageStore").append(div);
 
@@ -134,12 +181,10 @@ function clickCard() {
  * @param list card의 이름이 담긴 배열
  */
 function getHands(list){
-    console.log(list)
-
     list.map(e => {
-        console.log(e);
         hands.pushHands(e);
     })
+    hands.sortCards();
 }
 
 function sendCard(){
