@@ -17,7 +17,7 @@ class Hands {
         this.HandsDOM.appendChild(copy);
     }
 
-    removeClickedHands(){
+    getClickedHands(){
         let target = this.HandsDOM.querySelectorAll(`.ClickedHand`);
         console.log(target);
 
@@ -29,26 +29,33 @@ class Hands {
 
         for(let e of target){
             cardNames.push(e.id);
-            e.remove();
         }
 
         return cardNames;
     }
 
+    removeHands(list){
+        let target = this.HandsDOM.querySelectorAll(`.Hand`);
+
+        for(let e of list){
+
+        }
+    }
+
     sortCards(){
         let items = this.HandsDOM.querySelectorAll(".Hand");
 
-        [...items].sort(
-            (fir,sec) => {
-                let a = fir.getAttribute("data-code").split("_");
-                let b = sec.getAttribute("data-code").split("_");
+        [...items].sort(this.sortRule).forEach(e => this.HandsDOM.appendChild(e));
+    }
 
-                let compareNum = this.numOrder(a[1]) - this.numOrder(b[1]);
-                let compareShape = this.shapeOrder(a[0]) - this.shapeOrder(b[0]);
+    sortRule(fir, sec){
+        let a = fir.getAttribute("data-code").split("_");
+        let b = sec.getAttribute("data-code").split("_");
 
-                return (compareNum === 0) ? compareShape : compareNum;
-            }
-        ).forEach(e => this.HandsDOM.appendChild(e));
+        let compareNum = this.numOrder(a[1]) - this.numOrder(b[1]);
+        let compareShape = this.shapeOrder(a[0]) - this.shapeOrder(b[0]);
+
+        return (compareNum === 0) ? compareShape : compareNum;
     }
 
     shapeOrder(shape){
@@ -188,7 +195,7 @@ function getHands(list){
 }
 
 function sendCard(){
-    let cardNames = hands.removeClickedHands();
+    let cardNames = hands.getClickedHands();
 
     stompClient.send(`/message/send/${params.roomId}`,{}, JSON.stringify({"type" : "SEND" , "playerId" : playerId, "value" : JSON.stringify(cardNames)}));
 

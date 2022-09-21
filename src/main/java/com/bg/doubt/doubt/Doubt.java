@@ -13,27 +13,27 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Doubt {
+    private String roomId;
     private String roomName;
     private final ArrayList<Player> players;
     private final LinkedList<CardList> field;
+    private final GameState gameState;
     private int turn;
-    private boolean isInit;
 
     private static final String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
-    public Doubt() {
+    public Doubt(String id, String name) {
         this.players = new ArrayList<>();
         this.field = new LinkedList<>();
+
+        this.roomId = id;
+        this.roomName = name;
+        this.gameState = new GameState();
         turn = 0;
-        isInit = false;
     }
 
     public String getRoomName() {
         return roomName;
-    }
-
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
     }
 
     public int numberOfPlayer(){
@@ -77,6 +77,13 @@ public class Doubt {
     }
 
     public SendCardData sendCard(String playerId ,CardList inputCards) throws Exception {
+        synchronized (gameState){
+            if(!gameState.canSendCard(playerId)){
+                throw new Exception("not your turn");
+            }
+            gameState.setNow(NowProcess.STANDBY_DOUBT);
+        }
+
         Player player =  findPlayerById(playerId);
         if(player.equals(Player.EmptyPlayer)){
             throw new Exception("Player Not Found");
@@ -94,6 +101,7 @@ public class Doubt {
         }
 
         turn++;
+        gameState.setTurnPlayerId(getTurnId());
 
         return SendCardData.builder()
                 .playerId(playerId)
@@ -124,7 +132,14 @@ public class Doubt {
         return findPlayerById(playerId);
     }
 
-    public DoubtResult callDoubt(String playerId){
+    public DoubtResult callDoubt(String playerId) throws Exception {
+        synchronized (gameState){
+            if(!gameState.canDoubt()){
+                throw new Exception("not Doubt Timing");
+            }
+            gameState.setNow(NowProcess.TURN);
+        }
+
         DoubtResult dr = new DoubtResult();
 
         List<String> last = field.peekLast().getCards();
@@ -150,6 +165,13 @@ public class Doubt {
     }
 
     public void gameStart() throws Exception {
+        synchronized (gameState){
+            if(!gameState.canStart()){
+                return;
+            }
+            gameState.setNow(NowProcess.TURN);
+        }
+
         boolean ready = players.stream().allMatch(Player::isReady);
 
         if(!ready){
@@ -162,16 +184,11 @@ public class Doubt {
             List<Integer> sub = initialOrder.subList(i*13, (i*13 + 13));
             System.out.println(sub);
 
-            CardList cl = new CardList(
-                    CardSetter.getCards(
-                            sub
-                    )
-            );
+            CardList cl = new CardList( CardSetter.getCards(sub) );
 
             players.get(i).gainCard(List.of(cl));
         }
 
-        isInit = true;
     }
 
     private List<Integer> setInitialOrder() {
@@ -207,9 +224,5 @@ public class Doubt {
                 .map(Player::getId)
                 .filter(id -> !id.equals(playerId))
                 .collect(Collectors.toList());
-    }
-
-    public boolean isInit() {
-        return isInit;
     }
 }

@@ -10,6 +10,8 @@ import com.bg.doubt.gameMessage.GameStatus;
 import com.bg.doubt.gameMessage.MessageType;
 import com.bg.doubt.gameMessage.RoomStatus;
 import com.google.gson.Gson;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -17,6 +19,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Slf4j
 public class DoubtService {
     Map<String, Doubt> gameRooms;
     Gson gson;
@@ -33,9 +36,7 @@ public class DoubtService {
     public String createGameroom(String gameName, String name) {
         String id = String.format("%s-%s",gameName, UUID.randomUUID());
 
-        Doubt doubt = new Doubt();
-        doubt.setRoomName(name);
-
+        Doubt doubt = new Doubt(id, name);
         gameRooms.put(id, doubt);
 
         //test 용 input-------------------------------------------------------------
@@ -75,11 +76,7 @@ public class DoubtService {
 
         Doubt gameRoom = gameRooms.get(roomId);
 
-        synchronized (gameRoom) {
-            if (!gameRoom.isInit()) {
-                gameRoom.gameStart();
-            }
-        }
+        gameRoom.gameStart();
 
         return gameRoom.getRoomStatusByPlayerId(msg.getPlayerId());
     }

@@ -84,7 +84,21 @@ public class DoubtHandler {
     @MessageMapping("/send/{roomId}")
     @SendTo("/topic/game-room/{roomId}")
     public GameMessage sendCard(GameMessage msg, @DestinationVariable("roomId") String roomId){
-        return messageWrapper(msg, roomId, (gm, s) -> doubtService.sendCard(gm, s));
+        GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.sendCard(gm, s));
+
+        if(gameMessage.getType().equals(MessageType.SEND)){
+            sendToPlayer(msg.getPlayerId(), successMessage(msg.getPlayerId(), msg.getValue()));
+        }
+
+        return gameMessage;
+    }
+
+    private GameMessage successMessage(String playerId, String value) {
+        return GameMessage.builder().
+                playerId(playerId).
+                type(MessageType.SUCCESS).
+                value(value).
+                build();
     }
 
     @MessageMapping("/doubt/{roomId}")
