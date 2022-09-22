@@ -18,8 +18,13 @@ public class GameState {
     boolean canDoubt(){
         return now.equals(NowProcess.STANDBY_DOUBT);
     }
+
+    @Override
+    public String toString() {
+        return "GameState{" +
+                "now=" + now +
+                ", turnPlayerId='" + turnPlayerId + '\'' +
+                '}';
+    }
 }
 
-enum NowProcess{
-    BEFORE_GAME, TURN, STANDBY_DOUBT
-}

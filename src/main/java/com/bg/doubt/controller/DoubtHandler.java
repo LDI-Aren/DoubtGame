@@ -87,17 +87,16 @@ public class DoubtHandler {
         GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.sendCard(gm, s));
 
         if(gameMessage.getType().equals(MessageType.SEND)){
-            sendToPlayer(msg.getPlayerId(), successMessage(msg.getPlayerId(), msg.getValue()));
+            sendToPlayer(msg.getPlayerId(), successMessage(msg.getPlayerId()));
         }
 
         return gameMessage;
     }
 
-    private GameMessage successMessage(String playerId, String value) {
+    private GameMessage successMessage(String playerId) {
         return GameMessage.builder().
                 playerId(playerId).
                 type(MessageType.SUCCESS).
-                value(value).
                 build();
     }
 

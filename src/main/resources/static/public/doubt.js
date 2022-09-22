@@ -2,6 +2,7 @@ class Hands {
     constructor(HandsDOM, cards){
         this.HandsDOM = HandsDOM;
         this.cards = cards;
+        this.sendedCards = [];
     }
 
     pushHands(cardName){
@@ -29,33 +30,30 @@ class Hands {
 
         for(let e of target){
             cardNames.push(e.id);
+            this.sendedCards.push(e);
         }
 
         return cardNames;
     }
 
-    removeHands(list){
-        let target = this.HandsDOM.querySelectorAll(`.Hand`);
-
-        for(let e of list){
-
+    removeHands(){
+        for(let e of this.sendedCards){
+            e.remove();
         }
     }
 
     sortCards(){
         let items = this.HandsDOM.querySelectorAll(".Hand");
 
-        [...items].sort(this.sortRule).forEach(e => this.HandsDOM.appendChild(e));
-    }
+        [...items].sort((fir, sec) => {
+            let a = fir.getAttribute("data-code").split("_");
+            let b = sec.getAttribute("data-code").split("_");
 
-    sortRule(fir, sec){
-        let a = fir.getAttribute("data-code").split("_");
-        let b = sec.getAttribute("data-code").split("_");
+            let compareNum = this.numOrder(a[1]) - this.numOrder(b[1]);
+            let compareShape = this.shapeOrder(a[0]) - this.shapeOrder(b[0]);
 
-        let compareNum = this.numOrder(a[1]) - this.numOrder(b[1]);
-        let compareShape = this.shapeOrder(a[0]) - this.shapeOrder(b[0]);
-
-        return (compareNum === 0) ? compareShape : compareNum;
+            return (compareNum === 0) ? compareShape : compareNum;
+        }).forEach(e => this.HandsDOM.appendChild(e));
     }
 
     shapeOrder(shape){

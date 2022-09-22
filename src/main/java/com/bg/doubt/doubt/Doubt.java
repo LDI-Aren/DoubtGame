@@ -29,7 +29,7 @@ public class Doubt {
         this.roomId = id;
         this.roomName = name;
         this.gameState = new GameState();
-        turn = 0;
+        turn = 2;
     }
 
     public String getRoomName() {
@@ -77,6 +77,8 @@ public class Doubt {
     }
 
     public SendCardData sendCard(String playerId ,CardList inputCards) throws Exception {
+        System.out.println(gameState.toString());
+
         synchronized (gameState){
             if(!gameState.canSendCard(playerId)){
                 throw new Exception("not your turn");
@@ -101,6 +103,11 @@ public class Doubt {
         }
 
         turn++;
+
+        while(getTurnId().equals("q")||getTurnId().equals("w")){
+            turn++;
+        }
+
         gameState.setTurnPlayerId(getTurnId());
 
         return SendCardData.builder()
@@ -170,6 +177,7 @@ public class Doubt {
                 return;
             }
             gameState.setNow(NowProcess.TURN);
+            gameState.setTurnPlayerId(getTurnId());
         }
 
         boolean ready = players.stream().allMatch(Player::isReady);
