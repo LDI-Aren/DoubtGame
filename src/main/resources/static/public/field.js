@@ -2,15 +2,14 @@ class Field{
     constructor(fieldDOM) {
         this.fieldDOM = fieldDOM;
         this.playerTurn = "";
+        this.nextCard = "";
         this.fieldCards = 0;
     }
 
-    setTurn(playerId, nextCard){
-        this.playerTurn = playerId;
-
-        let notification = `${this.importantTag(playerId)}님의 차례입니다`
+    setTurn(){
+        let notification = `${this.importantTag(this.playerTurn)}님의 차례입니다`
         notification += `<br>`
-        notification += `${this.importantTag(nextCard)}를 낼 차례입니다.`
+        notification += `${this.importantTag(this.nextCard)}를 낼 차례입니다.`
 
         this.fieldDOM.querySelector("#turn").innerHTML = notification;
     }
@@ -35,11 +34,17 @@ class Field{
 
     whenSEND(data){
         this.setCardNotification(data);
-        this.setTurn(data.nextPlayer, data.nextCard);
+        this.setStandByDoubt();
         this.setNumOfCards(data.numOfCards);
     }
 
+    setStandByDoubt(){
+        this.fieldDOM.querySelector("#turn").innerHTML = "의심된다면 Doubt버튼을 눌러주세요";
+    }
+
     whenSTART(turnPlayer) {
-        this.setTurn(turnPlayer, "A");
+        this.playerTurn = turnPlayer;
+        this.nextCard = "A";
+        this.setTurn();
     }
 }

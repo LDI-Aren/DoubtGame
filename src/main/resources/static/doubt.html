@@ -70,12 +70,13 @@
     let playerId = params.playerId;
     let playerManager = new PlayerManager(document.getElementById("Players"), playerId);
     let field = new Field(document.getElementById("GameField"));
+    let buttons = new Button(document.getElementById("rBtn"),document.getElementById("rcBtn"),document.getElementById("sBtn"),document.getElementById("dBtn"));
 
     let getMessage = {
         "START" : (id, data) => {
             let roomStatus = JSON.parse(data);
             getHands(roomStatus.myCards);
-            changeToStartButton();
+            changeToSendButton();
             playerManager.setGameStatus(roomStatus.playerAndCards);
             field.whenSTART(roomStatus.turnPlayer);
         },
@@ -99,9 +100,12 @@
             console.log(sendCardData);
             field.whenSEND(sendCardData);
             playerManager.sendCardCount(sendCardData);
+            buttons.choiceButton("doubt");
+            countDoubt();
         },
         "DOUBT" : (id, data) => {
-            console.log(data);
+            let doubtData = JSON.parse(data);
+            doubtResult[doubtData.result](id, doubtData);
         },
         "SUCCESS" : (id, data) => {
             hands.removeHands();
@@ -156,31 +160,16 @@
 
     function gameReady(){
         stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "true"}));
-        rBtn.classList.add("d-none");
-        rcBtn.classList.remove("d-none");
+        buttons.choiceButton("ready");
     }
 
     function readyCancel(){
         stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "false"}));
-        rBtn.classList.remove("d-none");
-        rcBtn.classList.add("d-none");
+        buttons.choiceButton("cancel");
     }
 
-    function changeToStartButton(){
-        Status.querySelectorAll(".readyBtn")
-            .forEach(b => {
-                b.setAttribute("disabled" , "disabled");
-                b.classList.add("d-none");
-            })
-
-        Status.querySelectorAll(".gameBtn")
-            .forEach(b => {
-                b.removeAttribute("disabled");
-
-                if(b.id === "sBtn"){
-                    b.classList.remove("d-none");
-                }
-            })
+    function changeToSendButton(){
+        buttons.choiceButton("send");
     }
 
 </script>

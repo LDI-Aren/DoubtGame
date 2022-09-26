@@ -119,7 +119,7 @@ public class DoubtService {
             throw new Exception("게임방이 존재하지 않습니다.");
         }
 
-        DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getPlayerId());
+        DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getPlayerId(), msg.getValue());
         return dr;
     }
 

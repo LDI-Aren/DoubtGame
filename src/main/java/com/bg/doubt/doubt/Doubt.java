@@ -139,12 +139,19 @@ public class Doubt {
         return findPlayerById(playerId);
     }
 
-    public DoubtResult callDoubt(String playerId) throws Exception {
+    public DoubtResult callDoubt(String playerId, String value) throws Exception {
         synchronized (gameState){
             if(!gameState.canDoubt()){
                 throw new Exception("not Doubt Timing");
             }
             gameState.setNow(NowProcess.TURN);
+        }
+
+        if(!Boolean.parseBoolean(value)){
+            return DoubtResult.builder()
+                    .playerId(playerId)
+                    .result(DoubtResultType.NODOUBT)
+                    .build();
         }
 
         DoubtResult dr = new DoubtResult();
@@ -156,7 +163,7 @@ public class Doubt {
         Player player = getLosePlayer(result, playerId);
         player.gainCard(field);
 
-        dr.setResult(result);
+        dr.setResult(result ? DoubtResultType.SUCCESS : DoubtResultType.FAIL);
         dr.setPlayerId(player.getId());
 
         field.clear();

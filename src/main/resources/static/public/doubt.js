@@ -201,5 +201,42 @@ function sendCard(){
 }
 
 function doubt(){
-    stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "playerId" : playerId}));
+    stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "playerId" : playerId, "value" : true}));
+}
+
+function countDoubt(){
+    console.log("타이머 세팅")
+    setTimeout(doubtTimeOver, 5000);
+}
+
+function doubtTimeOver(){
+    stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "playerId" : playerId, "value" : false}));
+    console.log("타이머 끝")
+}
+
+let doubtResult = {
+    "noDoubt" : noDoubt,
+    "success" : successDoubt,
+    "fail" : failDoubt
+}
+
+function noDoubt(id, data){
+    console.log("noDoubt");
+    console.log(id);
+    console.log(data);
+
+    field.setTurn();
+    buttons.choiceButton("send");
+}
+
+function successDoubt(id, data){
+    console.log("success");
+    console.log(id);
+    console.log(data);
+}
+
+function failDoubt(id ,data){
+    console.log("fail");
+    console.log(id);
+    console.log(data);
 }

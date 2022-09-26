@@ -101,8 +101,15 @@ public class DoubtHandler {
     }
 
     @MessageMapping("/doubt/{roomId}")
-    @SendTo("/topic/game-room/{roomId}")
-    public GameMessage callDoubt(GameMessage msg, @DestinationVariable("roomId") String roomId) {
-        return messageWrapper(msg, roomId, (gm, s) -> doubtService.callDoubt(gm, s));
+    public void callDoubt(GameMessage msg, @DestinationVariable("roomId") String roomId) {
+        GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.callDoubt(gm, s));
+
+        /*
+        * gameMessage 결과에 따라
+        * 1. 모두에게 doubt가 없다는 걸 모두에게 전달
+        * 2. 누군가의 doubt결과를 모두에게 전달
+        * 3. 최초 doubt요청 이외의 요청에 전달하지 않음
+        * */
+
     }
 }
