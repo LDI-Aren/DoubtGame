@@ -36,6 +36,9 @@ class Field{
         this.setCardNotification(data);
         this.setStandByDoubt();
         this.setNumOfCards(data.numOfCards);
+
+        this.playerTurn = data.nextPlayer;
+        this.nextCard = data.nextCard;
     }
 
     setStandByDoubt(){

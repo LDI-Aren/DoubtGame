@@ -38,7 +38,6 @@ public class DoubtHandler {
             Object result = func.apply(msg, roomId);
             returnMessage.setValue(gson.toJson(result));
         } catch (Exception e) {
-            e.printStackTrace();
             returnMessage.setType(MessageType.ERROR);
             returnMessage.setValue(e.getMessage());
         }
@@ -71,7 +70,6 @@ public class DoubtHandler {
     @MessageMapping("/ready/{roomId}")
     @SendTo("/topic/game-room/{roomId}")
     public GameMessage ready(GameMessage msg , @DestinationVariable("roomId") String roomId){
-        log.info("ready : " + msg.getPlayerId());
         return messageWrapper(msg, roomId,  (gm, s) -> doubtService.gameReady(gm, s));
     }
 
@@ -104,12 +102,7 @@ public class DoubtHandler {
     public void callDoubt(GameMessage msg, @DestinationVariable("roomId") String roomId) {
         GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.callDoubt(gm, s));
 
-        /*
-        * gameMessage 결과에 따라
-        * 1. 모두에게 doubt가 없다는 걸 모두에게 전달
-        * 2. 누군가의 doubt결과를 모두에게 전달
-        * 3. 최초 doubt요청 이외의 요청에 전달하지 않음
-        * */
-
+        List<String> players = doubtService.getPlayerIdByGameMessage(roomId, gameMessage.getType());
+        sendToPlayer(players, gameMessage);
     }
 }

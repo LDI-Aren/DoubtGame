@@ -1,24 +1,26 @@
 package com.bg.doubt.doubt;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
-@Builder
+@NoArgsConstructor
 public class DoubtResult {
     private DoubtResultType result;
     private List<String> lastCards;
 
     private String playerId;
 
-    DoubtResult(){
-        result = DoubtResultType.NODOUBT;
+    public static DoubtResult noDoubtInit(String playerId){
+        DoubtResult dr = new DoubtResult();
+        dr.setPlayerId(playerId);
+        dr.setResult(DoubtResultType.NODOUBT);
+        return dr;
     }
 }
 
 enum DoubtResultType{
-    NODOUBT, SUCCESS, FAIL
+    NODOUBT, SUCCESS, FAIL;
 }

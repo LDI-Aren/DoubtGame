@@ -1,7 +1,6 @@
 package com.bg.doubt.doubt;
 
 import com.bg.doubt.Player.Player;
-import com.bg.doubt.Player.PlayerAndCard;
 import com.bg.doubt.Player.PlayerProfile;
 import com.bg.doubt.card.CardList;
 import com.bg.doubt.controller.RoomElement;
@@ -11,7 +10,6 @@ import com.bg.doubt.gameMessage.MessageType;
 import com.bg.doubt.gameMessage.RoomStatus;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,18 +36,6 @@ public class DoubtService {
 
         Doubt doubt = new Doubt(id, name);
         gameRooms.put(id, doubt);
-
-        //test 용 input-------------------------------------------------------------
-        try {
-            joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("q").value("q").build(), id);
-            joinPlayer(GameMessage.builder().type(MessageType.JOIN).playerId("w").value("w").build(), id);
-
-            gameReady(GameMessage.builder().type(MessageType.READY).playerId("q").value("true").build(), id);
-            gameReady(GameMessage.builder().type(MessageType.READY).playerId("w").value("true").build(), id);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        //---------------------------------------------------------------------------
 
         return id;
     }
@@ -106,9 +92,6 @@ public class DoubtService {
 
         Player nextPlayer = null;
 
-        System.out.println("In SendCard : ");
-        System.out.println(msg.getPlayerId());
-        System.out.println(cards);
         SendCardData rs = gameRooms.get(roomId).sendCard(msg.getPlayerId(),cards);
 
         return rs;
@@ -148,6 +131,14 @@ public class DoubtService {
 
     public List<String> getDestinationPlayerId(String roomId, String playerId) {
 
-        return gameRooms.get(roomId).getDestinationPlayerId(playerId);
+        return gameRooms.get(roomId).getPlayerIdWithout(playerId);
+    }
+
+    public List<String> getPlayerIdByGameMessage(String roomId, MessageType type) {
+        if(type.equals(MessageType.ERROR)){
+            return new ArrayList<>();
+        }
+
+        return gameRooms.get(roomId).getPlayerIdAll();
     }
 }

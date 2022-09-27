@@ -11,6 +11,8 @@
 <script src="/public/doubt.js"></script>
 <script src="/public/Player.js"></script>
 <script src="/public/field.js"></script>
+<script src="/public/button.js"></script>
+<script src="/public/doubtCall.js"></script>
 
 <body>
     <div class="Field">
@@ -45,7 +47,7 @@
         <div id="Status" class="BtnField">
             <div id="my-name" class="my-field">이름</div>
             <button id="sBtn" class="gameBtn blueBtn playBtn d-none" disabled onclick="sendCard()">카드 내기</button>
-            <button id="dBtn" class="gameBtn redBtn playBtn d-none" disabled onclick="doubt()">다우트</button>
+            <button id="dBtn" class="gameBtn redBtn playBtn d-none" disabled onclick="doubtCall.doubt()">다우트</button>
             <button id="rBtn" class="readyBtn blueBtn playBtn" onclick="gameReady()">준비</button>
             <button id="rcBtn" class="readyBtn grayBtn playBtn d-none" onclick="readyCancel()">준비완료</button>
             <div id="my-status" class="my-field" data-status>준비해주세요</div>
@@ -71,6 +73,7 @@
     let playerManager = new PlayerManager(document.getElementById("Players"), playerId);
     let field = new Field(document.getElementById("GameField"));
     let buttons = new Button(document.getElementById("rBtn"),document.getElementById("rcBtn"),document.getElementById("sBtn"),document.getElementById("dBtn"));
+    let doubtCall = new DoubtCall();
 
     let getMessage = {
         "START" : (id, data) => {
@@ -101,11 +104,11 @@
             field.whenSEND(sendCardData);
             playerManager.sendCardCount(sendCardData);
             buttons.choiceButton("doubt");
-            countDoubt();
+            doubtCall.countDoubt();
         },
         "DOUBT" : (id, data) => {
             let doubtData = JSON.parse(data);
-            doubtResult[doubtData.result](id, doubtData);
+            doubtCall.doubtResult(id, doubtData);
         },
         "SUCCESS" : (id, data) => {
             hands.removeHands();

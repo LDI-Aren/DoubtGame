@@ -29,7 +29,7 @@ public class Doubt {
         this.roomId = id;
         this.roomName = name;
         this.gameState = new GameState();
-        turn = 2;
+        turn = 0;
     }
 
     public String getRoomName() {
@@ -42,7 +42,6 @@ public class Doubt {
 
     private Player findPlayerById(String playerId){
         for (Player player : players) {
-            System.out.println(playerId + " : " + player.getId());
             if(player.getId().equals(playerId)){
                 return player;
             }
@@ -77,8 +76,6 @@ public class Doubt {
     }
 
     public SendCardData sendCard(String playerId ,CardList inputCards) throws Exception {
-        System.out.println(gameState.toString());
-
         synchronized (gameState){
             if(!gameState.canSendCard(playerId)){
                 throw new Exception("not your turn");
@@ -103,10 +100,6 @@ public class Doubt {
         }
 
         turn++;
-
-        while(getTurnId().equals("q")||getTurnId().equals("w")){
-            turn++;
-        }
 
         gameState.setTurnPlayerId(getTurnId());
 
@@ -148,10 +141,7 @@ public class Doubt {
         }
 
         if(!Boolean.parseBoolean(value)){
-            return DoubtResult.builder()
-                    .playerId(playerId)
-                    .result(DoubtResultType.NODOUBT)
-                    .build();
+            return DoubtResult.noDoubtInit(playerId);
         }
 
         DoubtResult dr = new DoubtResult();
@@ -163,7 +153,7 @@ public class Doubt {
         Player player = getLosePlayer(result, playerId);
         player.gainCard(field);
 
-        dr.setResult(result ? DoubtResultType.SUCCESS : DoubtResultType.FAIL);
+        dr.setResult(result ? DoubtResultType.FAIL : DoubtResultType.SUCCESS);
         dr.setPlayerId(player.getId());
 
         field.clear();
@@ -197,7 +187,6 @@ public class Doubt {
 
         for(int i = 0 ; i < players.size() ; ++i){
             List<Integer> sub = initialOrder.subList(i*13, (i*13 + 13));
-            System.out.println(sub);
 
             CardList cl = new CardList( CardSetter.getCards(sub) );
 
@@ -234,10 +223,14 @@ public class Doubt {
                 .collect(Collectors.toList());
     }
 
-    public List<String> getDestinationPlayerId(String playerId) {
+    public List<String> getPlayerIdAll() {
+        return getPlayerIdWithout(null);
+    }
+
+    public List<String> getPlayerIdWithout(String playerId){
         return players.stream()
                 .map(Player::getId)
-                .filter(id -> !id.equals(playerId))
+                .filter(p -> !p.equals(playerId))
                 .collect(Collectors.toList());
     }
 }
