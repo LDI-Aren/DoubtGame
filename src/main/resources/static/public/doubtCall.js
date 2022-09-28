@@ -2,7 +2,7 @@ class DoubtCall{
     constructor() {
         this.isNoDoubt = false;
         this.doubtResultFunction = {
-            "NODOUBT" : this.noDoubt,
+            "NODOUBT" : this.doNextTurn,
             "SUCCESS" : this.successDoubt,
             "FAIL" : this.failDoubt
         }
@@ -31,7 +31,7 @@ class DoubtCall{
         stompClient.send(`/message/doubt/${params.roomId}`,{}, JSON.stringify({"type" : "DOUBT" , "playerId" : playerId, "value" : false}));
     }
 
-    noDoubt(id, data){
+    doNextTurn(){
         field.setTurn();
         buttons.choiceButton("send");
     }
@@ -42,7 +42,14 @@ class DoubtCall{
         console.log(data);
 
         field.successDoubt(id, data);
-        this.doubtProcess(data.playerId);
+
+        if(data.playerId === playerId){
+            hands.getGainCards();
+        }
+
+        playerManager.getDoubtCards(data.playerId);
+
+        setTimeout(doubtCall.doNextTurn,5000);
     }
 
     failDoubt(id ,data){
@@ -51,16 +58,15 @@ class DoubtCall{
         console.log(data);
 
         field.failDoubt(id, data);
-        this.doubtProcess(data.playerId);
+
+        if(data.playerId === playerId){
+            hands.getGainCards();
+        }
+
+        playerManager.getDoubtCards(data.playerId);
+
+        setTimeout(doubtCall.doNextTurn,5000);
     }
 
-    doubtProcess(playerId){
-        /*
-        * playerId 의 player에게 카드를 추가
-        * 모든 플레이어에게 마지막에 나왔던 카드 보여주기
-        * 다음 턴 진행
-        *
-        * + 카드를 받아야하는 플레이어에게 받아야하는 카드 보내주기
-        * */
-    }
+
 }

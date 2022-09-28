@@ -83,6 +83,10 @@
             playerManager.setGameStatus(roomStatus.playerAndCards);
             field.whenSTART(roomStatus.turnPlayer);
         },
+        "GAIN" : (id, data) => {
+            let myCards = JSON.parse(data);
+            getHands(myCards);
+        },
         "JOIN" : (id, data) => {
             console.log(data);
             console.log(id + " 님이 입장했습니다.");
@@ -163,12 +167,12 @@
 
     function gameReady(){
         stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "true"}));
-        buttons.choiceButton("ready");
+        buttons.choiceButton("cancel");
     }
 
     function readyCancel(){
         stompClient.send(`/message/ready/${params.roomId}`,{}, JSON.stringify({"type" : "READY" , "playerId" : playerId , "value" : "false"}));
-        buttons.choiceButton("cancel");
+        buttons.choiceButton("ready");
     }
 
     function changeToSendButton(){

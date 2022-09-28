@@ -32,7 +32,7 @@ class Player{
     }
 
     /**
-     * @param numOfCards : Number 차례인 player가 낸 카드의 수
+     * @param numOfCards : Number 카드를 내거나 받게 됐을 때 카드의 수를 셈
      */
     cardCount(numOfCards){
         this.cards += numOfCards;
@@ -130,5 +130,13 @@ class PlayerManager{
         console.log(data.playerId);
         console.log(this.players[data.playerId]);
         this.players[data.playerId].cardCount(-data.numOfCards);
+    }
+
+    /**
+     * @param id : String 카드를 받을 플레이어의 아이디
+     * @param num : Number 받는 카드의 수
+     */
+    getDoubtCards(id){
+        this.players[id].cardCount(field.getFieldCardsAndClear());
     }
 }

@@ -50,4 +50,26 @@ class Field{
         this.nextCard = "A";
         this.setTurn();
     }
+
+    getFieldCardsAndClear(){
+        let num = this.fieldCards;
+        this.fieldCards = 0;
+        return num;
+    }
+
+    successDoubt(id, data) {
+        this.fieldDOM.querySelector("#card-notification").innerHTML =
+            `${this.importantTag(id)} 님의 다우트 성공!`
+
+        this.fieldDOM.querySelector("#turn").innerHTML =
+            `마지막에 낸 카드들은 ${this.importantTag(data.lastCards)} 입니다. <br> 5초 뒤 턴이 진행됩니다.`;
+    }
+
+    failDoubt(id, data) {
+        this.fieldDOM.querySelector("#card-notification").innerHTML =
+            `${this.importantTag(id)} 님의 다우트 실패!`
+
+        this.fieldDOM.querySelector("#turn").innerHTML =
+            `마지막에 낸 카드들은 ${this.importantTag(data.lastCards)} 입니다. <br> 5초 뒤 턴이 진행됩니다.`;
+    }
 }

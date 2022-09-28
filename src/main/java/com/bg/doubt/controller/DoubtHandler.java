@@ -105,4 +105,11 @@ public class DoubtHandler {
         List<String> players = doubtService.getPlayerIdByGameMessage(roomId, gameMessage.getType());
         sendToPlayer(players, gameMessage);
     }
+
+    @MessageMapping("/gain/{roomId}")
+    public void getGainCards(GameMessage msg, @DestinationVariable("roomId") String roomId) {
+        GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.getGainCards(s, gm.getPlayerId()));
+
+        sendToPlayer(gameMessage.getPlayerId(), gameMessage);
+    }
 }

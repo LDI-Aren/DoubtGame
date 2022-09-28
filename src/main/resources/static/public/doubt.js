@@ -86,6 +86,10 @@ class Hands {
 
         return 14;
     }
+
+    getGainCards(){
+        stompClient.send(`/message/gain/${params.roomId}`,{}, JSON.stringify({"type" : "GAIN" , "playerId" : playerId}));
+    }
 }
 
 const CARD = [

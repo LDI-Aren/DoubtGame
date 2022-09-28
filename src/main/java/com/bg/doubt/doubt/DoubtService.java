@@ -141,4 +141,12 @@ public class DoubtService {
 
         return gameRooms.get(roomId).getPlayerIdAll();
     }
+
+    public List<String> getGainCards(String roomId, String playerId) throws Exception {
+        if(!gameRooms.containsKey(roomId)){
+            throw new Exception("게임방이 존재하지 않습니다.");
+        }
+
+        return gameRooms.get(roomId).getGainCards(playerId);
+    }
 }

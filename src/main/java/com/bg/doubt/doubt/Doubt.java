@@ -18,6 +18,7 @@ public class Doubt {
     private final ArrayList<Player> players;
     private final LinkedList<CardList> field;
     private final GameState gameState;
+    private final DoubtData doubtData;
     private int turn;
 
     private static final String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
@@ -25,6 +26,7 @@ public class Doubt {
     public Doubt(String id, String name) {
         this.players = new ArrayList<>();
         this.field = new LinkedList<>();
+        this.doubtData = new DoubtData();
 
         this.roomId = id;
         this.roomName = name;
@@ -125,7 +127,7 @@ public class Doubt {
     }
 
     private Player getLosePlayer(boolean result, String playerId){
-        if(result){
+        if(!result){
             return players.get((turn-1)%4);
         }
 
@@ -151,7 +153,9 @@ public class Doubt {
 
         boolean result = isMatch(last);
         Player player = getLosePlayer(result, playerId);
+
         player.gainCard(field);
+        doubtData.setData(player.getId(), field);
 
         dr.setResult(result ? DoubtResultType.FAIL : DoubtResultType.SUCCESS);
         dr.setPlayerId(player.getId());
@@ -232,5 +236,13 @@ public class Doubt {
                 .map(Player::getId)
                 .filter(p -> !p.equals(playerId))
                 .collect(Collectors.toList());
+    }
+
+    public List<String> getGainCards(String playerId) throws Exception {
+        if(!playerId.equals(doubtData.playerId)){
+            throw new Exception("PlayerId MisMatch In GainCard");
+        }
+
+        return doubtData.getData();
     }
 }
