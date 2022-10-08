@@ -38,6 +38,10 @@ public class Player {
         return cards.getCards();
     }
 
+    public String getCardsToString() {
+        return cards.getCardsToJsonArray();
+    }
+
     public int sendCards(CardList inputCards){
         if(cards.removeCard(inputCards)){
             return -1;

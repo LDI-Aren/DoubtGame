@@ -19,6 +19,8 @@ public class GameState {
         return now.equals(NowProcess.STANDBY_DOUBT);
     }
 
+    boolean isFinish(){return now.equals(NowProcess.FINISH);}
+
     @Override
     public String toString() {
         return "GameState{" +

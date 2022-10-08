@@ -6,11 +6,14 @@ class DoubtCall{
             "SUCCESS" : this.successDoubt,
             "FAIL" : this.failDoubt
         }
+
+        this.isFinish = false;
     }
 
     doubtResult(id, data) {
         this.isNoDoubt = false;
 
+        this.isFinish = data.isFinish;
         this.doubtResultFunction[data.result](id, data);
     }
 
@@ -32,6 +35,12 @@ class DoubtCall{
     }
 
     doNextTurn(){
+        if(this.isFinish){
+            console.log("game is finish");
+            getFinishGameData();
+            return;
+        }
+
         field.setTurn();
         buttons.choiceButton("send");
     }

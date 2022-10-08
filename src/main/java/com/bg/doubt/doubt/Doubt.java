@@ -13,22 +13,23 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Doubt {
-    private String roomId;
-    private String roomName;
+    private final String roomName;
+    private final String roomId;
     private final ArrayList<Player> players;
     private final LinkedList<CardList> field;
     private final GameState gameState;
     private final DoubtData doubtData;
+    private  GameLog gameLog;
     private int turn;
 
     private static final String[] ordered = {"A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"};
 
-    public Doubt(String id, String name) {
+    public Doubt(String name, String roomId) {
         this.players = new ArrayList<>();
         this.field = new LinkedList<>();
         this.doubtData = new DoubtData();
 
-        this.roomId = id;
+        this.roomId = roomId;
         this.roomName = name;
         this.gameState = new GameState();
         turn = 0;
@@ -97,13 +98,11 @@ public class Doubt {
         int result = player.sendCards(inputCards);
         field.add(inputCards);
 
-        if(result == 0){
-            //해당 turn player의 승리
-        }
-
         turn++;
 
         gameState.setTurnPlayerId(getTurnId());
+
+        gameLog.setLog(inputCards.getCardsToJsonArray());
 
         return SendCardData.builder()
                 .playerId(playerId)
@@ -143,10 +142,18 @@ public class Doubt {
         }
 
         if(!Boolean.parseBoolean(value)){
-            return DoubtResult.noDoubtInit(playerId);
+            DoubtResult noDr = DoubtResult.noDoubtInit(playerId);
+
+            isFinish().ifPresent( p -> {
+                gameState.setNow(NowProcess.FINISH);
+                noDr.setFinish(true);
+            });
+
+            return noDr;
         }
 
         DoubtResult dr = new DoubtResult();
+        dr.setFinish(false);
 
         List<String> last = field.peekLast().getCards();
         dr.setLastCards(List.copyOf(last));
@@ -161,7 +168,19 @@ public class Doubt {
         dr.setPlayerId(player.getId());
 
         field.clear();
+
+        isFinish().ifPresent( p -> {
+            dr.setFinish(true);
+            gameState.setNow(NowProcess.FINISH);
+        });
+
+        gameLog.setLog("doubt");
+
         return dr;
+    }
+
+    private Optional<Player> isFinish() {
+        return players.stream().filter(p -> p.getCards().isEmpty()).findFirst();
     }
 
     /* test용 게임의 전체 상태를 나타냄 */
@@ -189,14 +208,18 @@ public class Doubt {
 
         List<Integer> initialOrder = setInitialOrder();
 
-        for(int i = 0 ; i < players.size() ; ++i){
-            List<Integer> sub = initialOrder.subList(i*13, (i*13 + 13));
+        for(int i = 0 ; i < players.size() ; ++i) {
+            List<Integer> sub = initialOrder.subList(i * 13, (i * 13 + 13));
 
-            CardList cl = new CardList( CardSetter.getCards(sub) );
+            CardList cl = new CardList(CardSetter.getCards(sub));
 
             players.get(i).gainCard(List.of(cl));
         }
 
+        gameLog = new GameLog();
+        gameLog.setGameId(roomId);
+        gameLog.setPlayerIds(players);
+        gameLog.setPlayerCards(players);
     }
 
     private List<Integer> setInitialOrder() {
@@ -244,5 +267,25 @@ public class Doubt {
         }
 
         return doubtData.getData();
+    }
+
+    public void gameFinish() throws Exception {
+        if(!gameState.isFinish()){
+            throw new Exception("Not End Game");
+        }
+
+        Optional<Player> op = isFinish();
+
+        if(op.isEmpty()){
+            throw new Exception("I dont know Error");
+        }
+
+        gameLog.setWinPlayerId(op.get().getId());
+
+        //이후 로그 데이터를 db에 저장
+    }
+
+    public GameLog getFinishData() {
+        return gameLog;
     }
 }

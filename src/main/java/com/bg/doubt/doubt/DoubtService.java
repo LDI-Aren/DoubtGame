@@ -34,7 +34,7 @@ public class DoubtService {
     public String createGameroom(String gameName, String name) {
         String id = String.format("%s-%s",gameName, UUID.randomUUID());
 
-        Doubt doubt = new Doubt(id, name);
+        Doubt doubt = new Doubt(name, id);
         gameRooms.put(id, doubt);
 
         return id;
@@ -103,6 +103,7 @@ public class DoubtService {
         }
 
         DoubtResult dr = gameRooms.get(roomId).callDoubt(msg.getPlayerId(), msg.getValue());
+
         return dr;
     }
 
@@ -148,5 +149,11 @@ public class DoubtService {
         }
 
         return gameRooms.get(roomId).getGainCards(playerId);
+    }
+
+    public GameLog getFinishGameData(String roomId, String playerId) throws Exception {
+        gameRooms.get(roomId).gameFinish();
+
+        return gameRooms.get(roomId).getFinishData();
     }
 }

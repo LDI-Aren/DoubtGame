@@ -112,4 +112,11 @@ public class DoubtHandler {
 
         sendToPlayer(gameMessage.getPlayerId(), gameMessage);
     }
+
+    @MessageMapping("/finish/{roomId}")
+    public void getFinishGameData(GameMessage msg, @DestinationVariable("roomId") String roomId){
+        GameMessage gameMessage = messageWrapper(msg, roomId, (gm, s) -> doubtService.getFinishGameData(s, gm.getPlayerId()));
+
+        sendToPlayer(gameMessage.getPlayerId(), gameMessage);
+    }
 }

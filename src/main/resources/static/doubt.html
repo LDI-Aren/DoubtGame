@@ -116,6 +116,9 @@
         },
         "SUCCESS" : (id, data) => {
             hands.removeHands();
+        },
+        "FINISH" : (id, data) => {
+
         }
     }
 
@@ -177,6 +180,10 @@
 
     function changeToSendButton(){
         buttons.choiceButton("send");
+    }
+
+    function getFinishGameData(){
+        stompClient.send(`/message/finish/${params.roomId}`,{}, JSON.stringify({"type" : "FINISH" , "playerId" : playerId}));
     }
 
 </script>

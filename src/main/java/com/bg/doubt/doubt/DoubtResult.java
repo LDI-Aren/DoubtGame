@@ -13,6 +13,8 @@ public class DoubtResult {
 
     private String playerId;
 
+    private boolean isFinish;
+
     public static DoubtResult noDoubtInit(String playerId){
         DoubtResult dr = new DoubtResult();
         dr.setPlayerId(playerId);
