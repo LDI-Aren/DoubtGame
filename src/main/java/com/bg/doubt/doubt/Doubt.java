@@ -102,12 +102,12 @@ public class Doubt {
 
         gameState.setTurnPlayerId(getTurnId());
 
-        gameLog.setLog(inputCards.getCardsToJsonArray());
+        gameLog.setSendCardLog(inputCards.getCardsToJsonArray());
 
         return SendCardData.builder()
                 .playerId(playerId)
                 .cardNum(ordered[(turn-1)%13])
-                .numOfCards(inputCards.getSize())
+                .numOfCards(result)
                 .nextCard(ordered[turn%13])
                 .nextPlayer(getTurnId())
                 .build();
@@ -118,9 +118,9 @@ public class Doubt {
     }
 
     private boolean isMatch(List<String> last){
-        String pattern = ordered[(turn-1) % 13];
+        String cardNum = ordered[(turn-1) % 13];
 
-        String regex = "^.+_" + pattern;
+        String regex = "^.+_" + cardNum;
 
         return last.stream().allMatch(e -> e.matches(regex));
     }
@@ -174,7 +174,7 @@ public class Doubt {
             gameState.setNow(NowProcess.FINISH);
         });
 
-        gameLog.setLog("doubt");
+        gameLog.setDoubtLog(playerId);
 
         return dr;
     }
@@ -216,8 +216,7 @@ public class Doubt {
             players.get(i).gainCard(List.of(cl));
         }
 
-        gameLog = new GameLog();
-        gameLog.setGameId(roomId);
+        gameLog = new GameLog(roomId);
         gameLog.setPlayerIds(players);
         gameLog.setPlayerCards(players);
     }
@@ -287,5 +286,9 @@ public class Doubt {
 
     public GameLog getFinishData() {
         return gameLog;
+    }
+
+    public boolean isExistPlayer(String playerId) {
+        return players.stream().anyMatch(p->p.getId().equals(playerId));
     }
 }

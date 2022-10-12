@@ -2,6 +2,7 @@ package com.bg.doubt.controller;
 
 import com.bg.doubt.doubt.DoubtService;
 import com.bg.doubt.gameMessage.*;
+import com.bg.doubt.repository.GameResultRepository;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import java.util.List;
 public class DoubtHandler {
     DoubtService doubtService;
     SimpMessagingTemplate messagingTemplate;
+    GameResultRepository gameResultRepository;
     Gson gson;
 
     @Autowired
@@ -38,6 +40,7 @@ public class DoubtHandler {
             Object result = func.apply(msg, roomId);
             returnMessage.setValue(gson.toJson(result));
         } catch (Exception e) {
+            e.printStackTrace();
             returnMessage.setType(MessageType.ERROR);
             returnMessage.setValue(e.getMessage());
         }

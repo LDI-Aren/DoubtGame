@@ -8,8 +8,10 @@ import com.bg.doubt.gameMessage.GameMessage;
 import com.bg.doubt.gameMessage.GameStatus;
 import com.bg.doubt.gameMessage.MessageType;
 import com.bg.doubt.gameMessage.RoomStatus;
+import com.bg.doubt.repository.GameResultRepository;
 import com.google.gson.Gson;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -20,10 +22,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DoubtService {
     Map<String, Doubt> gameRooms;
+    GameResultRepository gameResultRepository;
     Gson gson;
 
-    public DoubtService() {
+    @Autowired
+    public DoubtService(GameResultRepository gameResultRepository) {
         this.gameRooms = new HashMap<>();
+        this.gameResultRepository = gameResultRepository;
         gson = new Gson();
     }
 
@@ -72,6 +77,10 @@ public class DoubtService {
             throw new Exception("게임방이 존재하지 않습니다.");
         }
 
+        if(gameRooms.get(roomId).isExistPlayer(msg.getPlayerId())){
+            throw new Exception("이미 존재하는 플레이어 입니다.");
+        }
+
         if(gameRooms.get(roomId).numberOfPlayer() >= 4){
             throw new Exception("방에 인원이 가득 찼습니다.");
         }
@@ -89,8 +98,6 @@ public class DoubtService {
         if(!gameRooms.containsKey(roomId)){
             throw new Exception("게임방이 존재하지 않습니다.");
         }
-
-        Player nextPlayer = null;
 
         SendCardData rs = gameRooms.get(roomId).sendCard(msg.getPlayerId(),cards);
 
@@ -152,8 +159,19 @@ public class DoubtService {
     }
 
     public GameLog getFinishGameData(String roomId, String playerId) throws Exception {
+        if(!gameRooms.containsKey(roomId)){
+            throw new Exception("게임방이 존재하지 않습니다.");
+        }
+
+        if(!gameRooms.get(roomId).isExistPlayer(playerId)){
+            throw new Exception("게임방의 플레이어가 아닙니다.");
+        }
+
         gameRooms.get(roomId).gameFinish();
 
-        return gameRooms.get(roomId).getFinishData();
+        GameLog gameFinishData = gameRooms.get(roomId).getFinishData();
+        gameResultRepository.save(gameFinishData.toGameResult());
+
+        return gameFinishData;
     }
 }

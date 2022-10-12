@@ -35,7 +35,9 @@ class DoubtCall{
     }
 
     doNextTurn(){
-        if(this.isFinish){
+        console.log(this.isFinish);
+
+        if(doubtCall.isFinish){
             console.log("game is finish");
             getFinishGameData();
             return;
