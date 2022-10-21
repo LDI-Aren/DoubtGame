@@ -2,30 +2,32 @@ package com.bg.doubt.controller;
 
 import com.bg.doubt.doubt.DoubtService;
 import com.bg.doubt.gameMessage.GameStatus;
+import com.bg.doubt.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-import java.io.IOException;
 import java.util.List;
 
 @Controller
 @Slf4j
 public class MainController {
     DoubtService doubtService;
+    UserService userService;
 
     @Autowired
-    public MainController(DoubtService doubtService) {
+    public MainController(DoubtService doubtService, UserService userService) {
         this.doubtService = doubtService;
+        this.userService = userService;
     }
 
-    @GetMapping("/")
-    public ModelAndView main(String gameName) throws IOException {
+    @GetMapping("/home")
+    public ModelAndView main(String gameName) {
         ModelAndView mav = new ModelAndView();
 
-        String viewName = "gamelist.html";
+        String viewName = "index.html";
 
         if(gameName != null){
             viewName = "gamelist.html";
@@ -78,5 +80,18 @@ public class MainController {
     @ResponseBody
     public GameStatus aa(@PathVariable String id){
         return doubtService.getGameStatus(id);
+    }
+
+    @GetMapping("/signup")
+    public String signupPage(){
+        return "/signup.html";
+    }
+
+    @PostMapping("/users")
+    @ResponseBody
+    public String joinUser(@RequestBody UserDto user){
+        UserDto userDto = userService.JoinUser(user);
+
+        return userDto.getUserId();
     }
 }

@@ -1,10 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kr">
 <head>
     <meta charset="UTF-8">
     <title>Index</title>
+    <link rel="stylesheet" href="/public/index/index.css">
+    <script src="/public/index/index.js"></script>
 </head>
 <body>
-  <h1>게임을 선택해주세요</h1>
+<div class="login-div">
+    <input id="userId" type="text" placeholder="아이디">
+    <input id="userPassword" type="password" placeholder="비밀번호">
+    <hr>
+    <button onclick="login()">로그인</button>
+    <a onclick="hrefCreateAccount()">아직 회원이 아니라면?</a>
+</div>
 </body>
+<script>
+    window.onload = () => {
+        if(isLogined()){
+            location.href="/?gameName=game"
+        }
+    }
+</script>
 </html>
