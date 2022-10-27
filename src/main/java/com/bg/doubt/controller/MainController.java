@@ -9,6 +9,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Controller
@@ -24,17 +26,15 @@ public class MainController {
     }
 
     @GetMapping("/home")
-    public ModelAndView main(String gameName) {
-        ModelAndView mav = new ModelAndView();
+    public String main() {
 
-        String viewName = "index.html";
+        return "/index.html";
+    }
 
-        if(gameName != null){
-            viewName = "gamelist.html";
-        }
+    @GetMapping("/games")
+    public String gamepage() {
 
-        mav.setViewName(viewName);
-        return mav;
+        return "/gamelist.html";
     }
 
     @GetMapping("/rooms/list")
@@ -49,7 +49,7 @@ public class MainController {
     @GetMapping("/games/{gameName}/rooms")
     public String getGameroomByRoomId(@PathVariable("gameName") String gameName, String roomId){
         if(doubtService.findRoomByRoomId(roomId).isEmpty()){
-            return  "/gamelist.html";
+            return  "redirect:/games";
         }
 
         return  "/" + gameName + ".html";
@@ -93,5 +93,16 @@ public class MainController {
         UserDto userDto = userService.JoinUser(user);
 
         return userDto.getUserId();
+    }
+
+    @PostMapping("/login")
+    @ResponseBody
+    public String Login(HttpServletResponse response){
+        if(response.getHeader("login-token") == null){
+            log.info("123456");
+        }
+
+        log.info("456123");
+        return "/games";
     }
 }

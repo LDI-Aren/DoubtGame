@@ -5,6 +5,3 @@ spring:
     url: jdbc:postgresql://localhost:5432/doubt
     username: admin_doil
     password: 1234
-
-doubt-url-pattern:
-  deny: /games/**

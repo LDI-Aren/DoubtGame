@@ -23,9 +23,10 @@ function login(){
 
     console.log(option);
 
-    fetch('/users', option)
-        .then(res=>res.json())
-        .then(data=>{
-            console.log(data);
-        })
+    fetch('/login', option)
+        .then(res=>{
+            let token = res.headers.get("login-token")
+            alert(token);
+            location.href="/games?loginToken="+token;
+        });
 }

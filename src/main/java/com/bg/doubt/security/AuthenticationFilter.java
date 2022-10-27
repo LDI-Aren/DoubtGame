@@ -2,9 +2,11 @@ package com.bg.doubt.security;
 
 import com.bg.doubt.user.LoginRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import javax.servlet.FilterChain;
@@ -14,11 +16,21 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
+@Slf4j
 public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+    TokenManager tokenManager;
+
+    public AuthenticationFilter(TokenManager tokenManager){
+        this.tokenManager = tokenManager;
+    }
+
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
+
         try {
             LoginRequest credit = new ObjectMapper().readValue(request.getInputStream(), LoginRequest.class);
+
+            log.info("Autentication : " + credit.getUserId());
 
             return getAuthenticationManager().authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -38,6 +50,13 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
 
-        super.successfulAuthentication(request, response, chain, authResult);
+        String userId = ((User)authResult.getPrincipal()).getUsername();
+        String token = tokenManager.createToken(userId);
+
+        response.addHeader("login-token", token);
+
+        log.info("AfterAutentication : " + token);
     }
+
+
 }
