@@ -1,7 +1,6 @@
 package com.bg.doubt.security;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,8 +11,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import javax.servlet.Filter;
-
 
 @Slf4j
 @Configuration
@@ -23,7 +20,7 @@ public class WebSecurity {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http,
                                            AuthenticationFilter authenticationFilter,
-                                           TokenFilter tokenFilter) throws Exception {
+                                           CookieFilter cookieFilter) throws Exception {
         http.csrf().disable();
 
         http.authorizeRequests()
@@ -36,7 +33,7 @@ public class WebSecurity {
                 .permitAll()
                 .and()
             .addFilter(authenticationFilter)
-            .addFilterBefore(tokenFilter,UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(cookieFilter,UsernamePasswordAuthenticationFilter.class);
 
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
@@ -52,8 +49,8 @@ public class WebSecurity {
     }
 
     @Bean
-    public TokenFilter getTokenFilter(TokenManager tokenManager){
-        return new TokenFilter(tokenManager);
+    public CookieFilter getTokenFilter(TokenManager tokenManager){
+        return new CookieFilter(tokenManager);
     }
 
     @Bean

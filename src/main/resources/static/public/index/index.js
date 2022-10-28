@@ -27,6 +27,6 @@ function login(){
         .then(res=>{
             let token = res.headers.get("login-token")
             alert(token);
-            location.href="/games?loginToken="+token;
+            location.href="/games";
         });
 }
