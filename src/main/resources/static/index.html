@@ -16,9 +16,11 @@
 </div>
 </body>
 <script>
-    window.onload = () => {
-        if(isLogined()){
-            location.href="/?gameName=game"
+    window.onload = async () => {
+        let userId = await getLoginedUserId();
+
+        if (userId !== null) {
+            location.href="/games?playerId=" + userId;
         }
     }
 </script>

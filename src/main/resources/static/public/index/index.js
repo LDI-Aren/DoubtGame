@@ -2,8 +2,16 @@ function hrefCreateAccount(){
     location.href="/signup";
 }
 
-function isLogined(){
-    return false;
+async function getLoginedUserId(){
+    let matches = document.cookie.match(new RegExp("(?:^|; )accessToken=([^;]*)"));
+    if(matches === null){
+        return null;
+    }
+
+    let userId = await fetch('/userId')
+        .then(res =>{ return res.json() })
+
+    return userId.userId;
 }
 
 function login(){
@@ -25,8 +33,6 @@ function login(){
 
     fetch('/login', option)
         .then(res=>{
-            let token = res.headers.get("login-token")
-            alert(token);
-            location.href="/games";
+            location.href="/games?playerId=" + id;
         });
 }

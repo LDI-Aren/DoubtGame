@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="kr">
 <head>
     <meta charset="UTF-8">
     <title>List</title>
@@ -9,43 +9,39 @@
     <button onclick="createGameroom()">게임방 만들기</button>
 
     <hr>
-    <input type="text" id = "playerId" placeholder="아이디">
-    <hr>
 
     <ui id = "roomList">
 
     </ui>
 </body>
 <script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+
     window.onload = ()=>{
         getRoomList();
+        setInterval(getRoomList, 5000);
     }
 
-    function getRoomList(){
-        fetch("rooms/list")
-            .then(d=>d.json())
-            .then(
-                e=>{
-                    roomList.innerHTML = "";
-                    e.forEach(a=>{
-                        let li = document.createElement("li");
-                        li.innerText = `${a.gameName} --- ${a.roomName} : ${a.roomId}`;
+    async function getRoomList(){
+        let list = await fetch("rooms/list");
+        list = await list.json();
 
-                        li.onclick = () => gameRoomClick(a.gameName, a.roomId);
-                        roomList.appendChild(li);
-                    })
-                }
-            );
+        console.log(list);
+
+        roomList.innerHTML = "";
+        list.forEach(a => {
+            let li = document.createElement("li");
+            li.innerText = `${a.gameName} --- ${a.roomName} : ${a.roomId}`;
+
+            li.onclick = () => gameRoomClick(a.gameName, a.roomId);
+            roomList.appendChild(li);
+        });
     }
 
     async function gameRoomClick(gameName, roomId) {
-        let playerId = document.getElementById("playerId").value;
-
-        if (playerId === "") {
-            return;
-        }
-
-        let isDuplicate = await duplicateCheck(playerId, roomId);
+        let isDuplicate = await duplicateCheck(params.playerId, roomId);
 
         console.log(isDuplicate);
 
@@ -55,7 +51,7 @@
         }
         console.log("out If")
 
-        location.href = `/games/${gameName}/rooms?roomId=${roomId}&playerId=${playerId}`
+        location.href = `/games/${gameName}/rooms?roomId=${roomId}&playerId=${params.playerId}`
     }
 
     function duplicateCheck(playerId, roomId){

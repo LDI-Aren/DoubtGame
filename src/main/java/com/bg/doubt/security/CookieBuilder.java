@@ -1,5 +1,7 @@
 package com.bg.doubt.security;
 
+import org.springframework.http.ResponseCookie;
+
 import javax.servlet.http.Cookie;
 
 public class CookieBuilder {
@@ -54,5 +56,37 @@ public class CookieBuilder {
             }
         }
         return cookie;
+    }
+
+    public Cookie buildAccessTokenCookie(String accessToken){
+        return this.name("accessToken")
+                .value(accessToken)
+                .httpOnly(false)
+                .maxAge(1800)
+                .build();
+    }
+
+    public Cookie buildRefreshTokenCookie(String refreshToken){
+        return this.name("refreshToken")
+                .value(refreshToken)
+                .httpOnly(true)
+                .maxAge(3600*24)
+                .build();
+    }
+
+    public Cookie destroyAccessTokenCookie(String accessToken){
+        return this.name("refreshToken")
+                .value(accessToken)
+                .httpOnly(false)
+                .maxAge(1)
+                .build();
+    }
+
+    public Cookie destroyRefreshTokenCookie(String refreshToken){
+        return this.name("refreshToken")
+                .value(refreshToken)
+                .httpOnly(true)
+                .maxAge(1)
+                .build();
     }
 }

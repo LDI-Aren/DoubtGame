@@ -2,6 +2,7 @@ package com.bg.doubt.controller;
 
 import com.bg.doubt.doubt.DoubtService;
 import com.bg.doubt.gameMessage.GameStatus;
+import com.bg.doubt.security.TokenManager;
 import com.bg.doubt.user.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +33,6 @@ public class MainController {
 
     @GetMapping("/games")
     public String gamepage() {
-
         return "/gamelist.html";
     }
 
@@ -87,21 +87,17 @@ public class MainController {
     }
 
     @PostMapping("/users")
-    @ResponseBody
-    public String joinUser(@RequestBody UserDto user){
+    public String joinUser(UserDto user){
         UserDto userDto = userService.JoinUser(user);
 
-        return userDto.getUserId();
+        return "redirect:/afterSignup.html?username=" + userDto.getUsername();
     }
 
-    @PostMapping("/login")
+    @GetMapping("/userId")
     @ResponseBody
-    public String Login(HttpServletResponse response){
-        if(response.getHeader("login-token") == null){
-            log.info("123456");
-        }
+    public String getUserId(@CookieValue("accessToken") String accessToken, TokenManager tokenManager){
+        String userId = tokenManager.getUserId(accessToken);
 
-        log.info("456123");
-        return "/games";
+        return String.format("{\"userId\":\"%s\"}", userId);
     }
 }

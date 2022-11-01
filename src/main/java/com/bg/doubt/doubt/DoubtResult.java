@@ -21,8 +21,9 @@ public class DoubtResult {
         dr.setResult(DoubtResultType.NODOUBT);
         return dr;
     }
+
+    public enum DoubtResultType{
+        NODOUBT, SUCCESS, FAIL;
+    }
 }
 
-enum DoubtResultType{
-    NODOUBT, SUCCESS, FAIL;
-}

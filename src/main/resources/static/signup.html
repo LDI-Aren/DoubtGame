@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <title>Signup</title>
+    <link rel="stylesheet" href="/public/index/index.css">
+</head>
+<body>
+    <form class="login-div" action="/users" method="post" onsubmit="return signCheck()">
+        <input class="signup-info valid-none" name="userId" type="text" data-valid="valid-none" placeholder="아이디">
+        <input class="signup-info valid-none" name="userPassword" type="password" data-valid="valid-none" placeholder="비밀번호">
+        <input class="signup-info valid-none" name="username" type="text" data-valid="valid-none" placeholder="이름">
+        <hr>
+        <button type="submit">회원 가입</button>
+    </form>
+</body>
+<script>
+    window.onload = () => {
+        document.querySelectorAll("input[data-valid]").forEach(input => input.addEventListener("focusout", e => validCheck(e.target)))
+    }
+
+    function signCheck(){
+        let isValid = true;
+        document.querySelectorAll(".signup-info").forEach(input => {
+            isvalid &= input.classList.contains("valid-true")
+            alert(isValid);
+        });
+
+        return isValid;
+    }
+
+    function validCheck(DOM){
+        let nowValid = DOM.getAttribute("data-valid");
+        if(DOM.value === ""){
+            DOM.setAttribute("data-valid", "valid-none");
+            DOM.classList.remove(nowValid);
+            DOM.classList.add("valid-none");
+            return;
+        }
+
+        if(checkInfo[DOM.name](DOM.value)){
+            DOM.setAttribute("data-valid","valid-true");
+            DOM.classList.remove(nowValid);
+            DOM.classList.add("valid-true");
+            return;
+        }
+
+        DOM.setAttribute("data-valid","valid-false");
+        DOM.classList.remove(nowValid);
+        DOM.classList.add("valid-false");
+    }
+
+    let checkInfo = {
+        "userId" : checkId,
+        "userPassword" : checkPassword,
+        "username" : checkName
+    }
+
+    function checkId(inputDom){
+        console.log("aaa");
+        return true;
+    }
+
+    function checkPassword(inputDom){
+        console.log("bbb");
+        return false;
+    }
+
+    function checkName(inputDom){
+        console.log("ccc");
+        return true;
+
+    }
+</script>
+</html>

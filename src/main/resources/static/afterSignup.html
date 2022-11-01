@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="kr">
+<head>
+    <meta charset="UTF-8">
+    <title>afterSignup</title>
+    <link rel="stylesheet" href="/public/index/index.css">
+</head>
+<body>
+    <div class="login-div">
+        <p>
+            <span id="userName">USER-NAME</span> 님,
+            가입을 환영합니다.
+        </p>
+        <button onclick="location.href='/home'">로그인하러 가기</button>
+    </div>
+</body>
+<script>
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+        get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    window.onload = ()=>{
+        userName.innerText = params.username;
+    }
+</script>
+</html>

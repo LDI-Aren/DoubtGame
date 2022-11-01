@@ -52,20 +52,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication authResult) throws IOException, ServletException {
 
         String userId = ((User)authResult.getPrincipal()).getUsername();
-        String token = tokenManager.createToken(userId);
+        String accessToken = tokenManager.createAccessToken(userId);
+        String refreshToken = tokenManager.createRefreshToken(userId);
 
-        response.addHeader("login-token", token);
-
-        Cookie cookie = (new CookieBuilder())
-                            .name("accessToken")
-                            .value(token)
-                            .httpOnly(true)
-                            .maxAge(3600*24)
-                            .build();
-
-        response.addCookie(cookie);
-
-        log.info("AfterAutentication : " + token);
+        response.addCookie(new CookieBuilder().buildAccessTokenCookie(accessToken));
+        response.addCookie(new CookieBuilder().buildRefreshTokenCookie(refreshToken));
     }
 
 

@@ -164,7 +164,7 @@ public class Doubt {
         player.gainCard(field);
         doubtData.setData(player.getId(), field);
 
-        dr.setResult(result ? DoubtResultType.FAIL : DoubtResultType.SUCCESS);
+        dr.setResult(result ? DoubtResult.DoubtResultType.FAIL : DoubtResult.DoubtResultType.SUCCESS);
         dr.setPlayerId(player.getId());
 
         field.clear();
